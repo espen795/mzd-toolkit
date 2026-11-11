@@ -5,7 +5,7 @@ Step-by-step guide to get the MZD Toolkit running on a Mazda Connect CMU.
 ## 1. Prerequisites
 
 - Mazda Connect CMU, firmware **v59.00.502** (recommended) or v74 (unstable — see [TROUBLESHOOTING.md](TROUBLESHOOTING.md))
-- **Root access on the CMU, with USB autorun enabled.** Since v59.00.502 Mazda patched USB autorun, so it must first be re-enabled via a serial or ID7 method — see [cmu-autorun](https://github.com/Trevelopment/cmu-autorun) and [MZD-AIO](https://github.com/Trevelopment/MZD-AIO). This toolkit assumes the autorun hook (`/jci/scripts/stage_wifi.sh` → `/data_persist/dev/bin/autorun`) is already in place; `install.sh` extends it, it does not create it from scratch.
+- **Root access on the CMU, with USB autorun already enabled.** Since v59.00.502 Mazda patched USB autorun — see **[ROOT-ACCESS.md](ROOT-ACCESS.md)** for the MP3/XSS workaround (mzd-connect-1-root), the Diagnostic-menu → JCI Test Mode method, or UART serial. This toolkit assumes the autorun hook (`/jci/scripts/stage_wifi.sh` → `/data_persist/dev/bin/autorun`) is already in place; `install.sh` extends it, it does not create it from scratch.
 - A USB stick, **FAT32, MBR partition table**
 - A PC (Linux/macOS/Windows) to prepare the stick and later to SSH in
 
@@ -46,10 +46,18 @@ Stick layout after extraction:
 ## 3. Install on the car
 
 1. Start the car with the USB stick inserted.
-2. The autorun hook fires `install.sh` (or the menu) automatically — wait 1–2 minutes. If nothing appears, open a terminal via your root exploit and run:
+2. **The menu does NOT autostart after install** — that is by design. After the
+   first `install.sh` run (or after a reboot), start the menu manually:
    ```sh
-   ls /tmp/mnt/                       # find the stick (usually sdb1, but check!)
-   sh /tmp/mnt/sdb1/mzd-toolkit/install.sh
+   sh /data_persist/mzd-toolkit/menu.sh        # from the persist install (no stick needed)
+   # or straight from USB:
+   sh /tmp/mnt/sd*/mzd-toolkit/menu.sh         # glob: no Shift key on the CMU terminal, so `sd*` not `sdb1`
+   ```
+   What DOES autostart on every boot (via the autorun hook, no menu needed):
+   WiFi connect, SSH on port 36000, and the eth1 dongle — see `net/autostart-eth1-ssh.sh`.
+   To make the menu itself launch at boot, add one line to `/data_persist/dev/bin/autorun`:
+   ```sh
+   sh /data_persist/mzd-toolkit/menu.sh >> /tmp/mzd-menu.log 2>&1 &
    ```
 3. `install.sh`:
    - copies the whole toolkit to `/data_persist/mzd-toolkit` (**persist-install** — after this the stick can be removed and everything keeps working after reboot),
@@ -57,15 +65,21 @@ Stick layout after extraction:
    - creates `mzd-data/{config,state,logs,backups,runs}` on both the stick and `/data_persist`,
    - patches `stage_wifi.sh` **and** `stage_1.sh` hooks (idempotent, `.org` backups),
    - runs a USB health pre-flight (rw-check + `LOST.DIR` detection — reformat the stick if it warns).
-4. Reboot the car. After reboot, WiFi + SSH autostart via `autorun`.
+4. Reboot the car. After reboot, WiFi + SSH autostart via `autorun` (the menu does not — start it manually as above, or add the autostart line).
 
-To run the menu manually at any time (with or without stick):
+### Switching between the terminal menu and the normal UI
 
-```sh
-sh /data_persist/mzd-toolkit/menu.sh
-# or straight from USB:
-sh /tmp/mnt/sdb1/mzd-toolkit/menu.sh
-```
+- Menu → **System & security → 4. Start terminal (diag code 22)** opens the
+  on-screen terminal directly (no GUI patch or reboot needed — uses the MMUI
+  `ReadDTC` D-Bus call with `testId=22`, fallback `/jci/scripts/run-terminal.sh`).
+- Menu → **System & security → 5. Close terminal / back to UI** kills the
+  terminal process and returns to the normal UI (`ivi-shell -f "Main"`).
+- Menu → **System & security → 6. Add terminal to settings menu** patches the
+  Settings GUI so a permanent **Terminal** entry appears under
+  Settings → System (after About). This needs a **reboot** to load the patched
+  JS (`Mute+Navi` 10 s). Without reboot, option 4 still works.
+- From the terminal you can always return to the toolkit menu by running
+  `sh /data_persist/mzd-toolkit/menu.sh` again.
 
 ## 4. Menu walkthrough
 
