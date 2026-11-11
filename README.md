@@ -86,7 +86,9 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 ## Documentation
 
 - [docs/INSTALL.md](docs/INSTALL.md) — USB stick prep, install, verification
+- [docs/ROOT-ACCESS.md](docs/ROOT-ACCESS.md) — how to get root + USB autorun first (MP3/XSS workaround, diagnostic menu, UART)
 - [docs/USAGE.md](docs/USAGE.md) — menu, all scripts, exit codes, SSH client commands
+- [docs/PUBLISH-PIPELINE.md](docs/PUBLISH-PIPELINE.md) — how this repo is published from internal research (translation + secret scan + deploy key)
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — known failure modes and fixes
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — CMU internals (GUI, D-Bus, partitions, autorun)
 - [docs/TESTING.md](docs/TESTING.md) — what was tested on real hardware
