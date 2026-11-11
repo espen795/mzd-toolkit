@@ -83,6 +83,23 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
 
 See [docs/INSTALL.md](docs/INSTALL.md) for the full walkthrough and [docs/USAGE.md](docs/USAGE.md) for every menu option and script.
 
+## Terminal shortcut & switching menu/UI
+
+- **System & security -> 4** starts the on-screen terminal instantly (MMUI
+  `ReadDTC` D-Bus call with `testId=22`; fallbacks `/jci/scripts/run-terminal.sh`
+  and `sh /jci/scripts/systemHooks.sh 22`) - no GUI patch, no reboot needed.
+- **System & security -> 5** closes the terminal and returns to the normal UI:
+  `killall terminal` / `pkill terminal` / `kill -9 $(pidof terminal)`, then
+  `ivi-shell -f "Main"`.
+- **System & security -> 6** adds a permanent **Terminal** entry to
+  Settings -> System via `tools/add-terminal-menu.sh` (quoted JS strings,
+  `sendEventToMmui("diag", "ReadDTC", { payload : { testId : 22 } })`);
+  reboot the CMU (Mute+Navi 10 s) to load the patched JS. Without reboot,
+  option 4 still works.
+- Optional: autostart the menu itself at boot - add one line to
+  `/data_persist/dev/bin/autorun`:
+  `sh /data_persist/mzd-toolkit/menu.sh >> /tmp/mzd-menu.log 2>&1 &`
+
 ## Safety warnings
 
 - **You are root on the head unit.** Anything you run can brick the CMU. Read before you run.
