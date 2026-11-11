@@ -7,7 +7,7 @@ How new knowledge flows from the internal workspace into the public GitHub repo
 
 | Internal path | Content |
 |---|---|
-| `projects/mazda-mzd/knowledge-base/` | Deep technical reference (rootfs diff, GUI architecture, system config, firmware map, binary map, CMU150 architecture) — **Dutch**, contains `fles9495.nl`/Gitea/wiki links and `<!-- project: -->` markers |
+| `projects/mazda-mzd/knowledge-base/` | Deep technical reference (rootfs diff, GUI architecture, system config, firmware map, binary map, CMU150 architecture) — **Dutch**, contains internal-domain/Gitea/wiki links and `<!-- project: -->` markers |
 | `projects/mazda-mzd/docs/` | Design docs, changelogs, analyses — Dutch, internal paths |
 | `projects/mazda-mzd/logs/from-mzd/` | Raw logs from the car (may contain MACs, IPs, SSIDs) |
 | `projects/mazda-mzd/archive/usb-root*/` | Exploit files (mp3 XSS payloads) — **never publish raw** |
@@ -81,7 +81,8 @@ sh toolkit/tools/build-release.sh X.Y.Z /tmp/mzd-rel   # secret-scan gate built 
 - `archive/usb-root*/mp3/*` — live XSS payloads (described in ROOT-ACCESS.md, files not shipped)
 - `secrets.conf`, `settings.conf`, `ssh/id_mzd*`, any key material
 - `~/.config/mzd-release-denylist.txt` (the denylist itself is personal)
-- Internal infra: `192.168.2.x`, `fles9495.nl`, Gitea, wiki links, `/home/remoter` paths
+- Internal infra: your home-LAN prefix (e.g. `192.168.<x>.x`), your personal
+  domain(s), internal Gitea/wiki hostnames, `/home/<you>` paths
 - `<!-- project: path:... -->` markers
 
 ## Quick checklist per publish
