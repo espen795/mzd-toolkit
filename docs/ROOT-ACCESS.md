@@ -45,12 +45,16 @@ USB-root/
 ## Method B — Diagnostic menu → JCI Test Mode (all firmwares)
 
 1. Hold **Music + Nav + Mute** together for ~3 seconds until the **Diagnostic
-   Menu** appears.
+   Menu** appears (left photo).
 2. In that menu, hold **DEL** for 15–20 seconds until **"JCI Test Mode Active"**
    shows — this is the "Test Screen" with *"Choose a script you would like to
-   run."*
+   run."* (right photo: RESET VIP, USB DRIVER, TAUSIM TOGGLE, **TERMINAL**,
+   WIFI AP TOGGLE, USERTTY TOGGLE).
 3. From there you can run scripts / enable the autorun path (this is how
    AIO-TI installs its tweaks on v59).
+
+![Diagnostic menu](img/jci-diagnostic-menu-web.jpg)
+![JCI Test Screen — "Choose a script you would like to run"](img/jci-test-screen-choose-script-web.jpg)
 
 ## Method C — UART serial (all firmwares, 115200 baud)
 

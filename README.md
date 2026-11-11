@@ -51,7 +51,7 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
 > **Step 0 — root first.** This toolkit does NOT root the CMU. On firmware
 > v59.00.502+ USB autorun is patched by Mazda — enable it first via the
 > **MP3/XSS workaround**, the **Diagnostic menu → JCI Test Mode**, or **UART
-> serial**. Full details + exact USB layout: **[docs/ROOT-ACCESS.md](docs/ROOT-ACCESS.md)**.
+> serial**. Full details + exact USB layout + screenshots: **[docs/ROOT-ACCESS.md](docs/ROOT-ACCESS.md)**.
 
 1. On a PC, download the latest `mzd-toolkit-vX.Y.Z.tar.gz` (+ `SHA256SUMS`) from the Releases page.
 2. Verify the checksum: `sha256sum -c SHA256SUMS`
@@ -65,8 +65,16 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
    ```
    What *does* autostart on every boot: WiFi connect, SSH on 36000, eth1 dongle.
 5. In the menu choose **3. All-in-one: WiFi + SSH + watchdog** — or drive the pieces individually.
-   Menu is **numeric-only** (type a number). Switch menu ↔ UI: System & security →
-   **4** starts the on-screen terminal (diag code 22, no patch needed), **5** closes it back to the UI.
+   The menu is **numeric-only** (type a number — the CMU terminal has no Shift key).
+   **Menu ↔ UI switching:** System & security → **4** starts the on-screen terminal
+   (diag code 22 via MMUI, no patch/reboot needed), **5** closes it back to the
+   normal UI. To make the menu itself a permanent shortcut, add one line to
+   `/data_persist/dev/bin/autorun`:
+   ```sh
+   sh /data_persist/mzd-toolkit/menu.sh >> /tmp/mzd-menu.log 2>&1 &
+   ```
+   Or patch the Settings GUI for a permanent Terminal entry:
+   System & security → **6** (needs a reboot to load the patched JS).
 6. From your PC:
    ```sh
    ssh -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o PubkeyAcceptedAlgorithms=+ssh-rsa \
