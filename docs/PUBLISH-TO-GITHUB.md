@@ -4,32 +4,35 @@ You do NOT need to give anyone (including an AI assistant) your GitHub API key o
 password. GitHub push happens from **your own machine** with **your own** credentials.
 The repo on disk is already clean and sanitized — see SECURITY-AUDIT.md.
 
-## 1. Create the repo on GitHub (web UI, 1 minute)
+## 1. The repo already exists (public, empty initial commit)
 
-1. Go to https://github.com/new
-2. Repository name: `mazda-mzd-toolkit` (or your preferred name)
-3. Description: `Open-source toolkit for Mazda Connect CMU (MZD): WiFi, SSH, USB tethering, LAN, CAN/VIM vehicle data, backups — firmware v59/v74`
-4. **Public**, add README (we already have one), license MIT (we ship LICENSE)
-5. Do NOT add .gitignore/.github defaults (we ship our own) — or let GitHub add them, then commit ours over.
-6. Click **Create repository**.
+`https://github.com/<your-user>/mzd-toolkit` — reading it needs no auth at all
+(public repo: `git clone`, Releases, raw files and even the REST API all work
+anonymously). Only **writing** (push) needs credentials.
 
 ## 2. Push from this machine (you type this, not the AI)
 
 ```bash
-cd /path/to/mazda-mzd-toolkit-public   # clone the repo locally, then cd into it
+cd /path/to/mazda-mzd-toolkit-public
 
-# Option A — HTTPS (asks for username + Personal Access Token once, then caches it)
-git remote add origin https://github.com/<YOUR-USERNAME>/mazda-mzd-toolkit.git
+# Option A — HTTPS + Personal Access Token (classic, scopes: repo)
+#   token: https://github.com/settings/tokens  (store in password manager, NEVER in chat)
+#   this host has credential.helper=store, so after one successful login it is cached
+#   in ~/.git-credentials
+git remote add origin https://github.com/<your-user>/mzd-toolkit.git
 git push -u origin main
-# When asked for a password, use a PAT: https://github.com/settings/tokens
-# (scopes: repo). Store it in your password manager, never in chat.
+# first push to an existing repo with an "Initial commit": use -f (safe: nothing to lose)
+#   git push -f origin main
 
 # Option B — SSH (recommended long-term)
-# ssh-keygen -t ed25519 -C "your@email"   (if you don't have a key yet)
-# add ~/.ssh/id_ed25519.pub at https://github.com/settings/keys
-git remote add origin git@github.com:<YOUR-USERNAME>/mazda-mzd-toolkit.git
-git push -u origin main
+#   1. upload ~/.ssh/id_ed25519.pub at https://github.com/settings/keys
+#   2. verify: ssh -T git@github.com   -> "Hi <your-user>! ..."
+git remote add origin git@github.com:<your-user>/mzd-toolkit.git
+git push -f origin main
 ```
+
+**Never** paste a token/key into a chat with an AI assistant — it ends up in logs.
+If a token ever leaks: revoke it immediately at https://github.com/settings/tokens.
 
 ## 3. First release
 
@@ -38,7 +41,6 @@ git push -u origin main
 sh toolkit/tools/build-release.sh 4.8.21 /tmp/mzd-release
 # -> mzd-toolkit-v4.8.21.tar.gz (PRIMARY for the car) + .zip (PC only) + SHA256SUMS
 
-# Tag + push
 git tag v4.8.21
 git push origin v4.8.21
 ```
@@ -48,13 +50,15 @@ three files from /tmp/mzd-release → Publish.**
 
 ## 4. Every future release
 
-Follow `RELEASE-CHECKLIST.md` in the repo root. In short: build → secret sweep →
-syntax check → tag → push → GitHub release with tar.gz + zip + SHA256SUMS.
+Follow `RELEASE-CHECKLIST.md` in the repo root: scanner self-test → tree scan →
+history scan → syntax check → binary check → build → tag → push → GitHub release.
 
-## 5. Repo settings to enable (GitHub web UI)
+## 5. Repo settings to enable (GitHub web UI, no credentials needed beyond your login)
 
 - Settings → General → Features: **Issues** on, **Discussions** optional, **Wiki** off (we use docs/)
-- Settings → Branches → Add rule: require PR reviews for `main` (protects you from accidental pushes)
-- Settings → Security → **Secret scanning** on (GitHub will alert if a key ever slips in)
-- Settings → Code scanning (CodeQL) optional for the shell scripts
-- About (right sidebar): topics `mazda`, `mazda-connect`, `cmu`, `mzd`, `infotainment`, `can-bus`, `embedded-linux`, `jailbreak`-free wording: `reverse-engineering`, `automotive`
+- Settings → Branches → protect `main` (require PR review)
+- Settings → Security → **Secret scanning** ON (GitHub alerts if a key ever slips in)
+- About (sidebar): description + topics: `mazda`, `mazda-connect`, `cmu`, `mzd`,
+  `infotainment`, `can-bus`, `embedded-linux`, `automotive`, `reverse-engineering`
+- Description suggestion: "Open-source toolkit for the Mazda Connect CMU: WiFi, SSH,
+  USB tethering, wired LAN, CAN/VIM vehicle data, backups — firmware v59/v74. Made with AI."
