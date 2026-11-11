@@ -14,7 +14,7 @@ How new knowledge flows from the internal workspace into the public GitHub repo
 
 ## Target (public)
 
-`/home/remoter/mazda-mzd-toolkit-public/` → `github.com/espen795/mzd-toolkit`
+`/path/to/mazda-mzd-toolkit-public/` → `github.com/<you>/mzd-toolkit`
 
 ## The pipeline (5 steps, ~15 min per batch)
 
@@ -25,7 +25,7 @@ Spawn a subagent per file (or small batch) with a strict prompt:
 > Translate this Dutch Markdown file to English for a PUBLIC open-source repo.
 > Rules: (1) keep all technical values, paths, commands, hex, versions verbatim;
 > (2) translate prose to natural technical English; (3) remove ALL PII: no
-> `fles9495.nl`, no Gitea/wiki internal links, no `/home/remoter` paths, no
+> `<your-domain>`, no internal Gitea/wiki links, no `/home/<you>` paths, no
 > `<!-- project: -->` markers, no real MACs/IPs/SSIDs — replace with
 > placeholders (`<CMU_IP>`, `aa:bb:cc:dd:ee:ff`, `YOUR_SSID`);
 > (4) ASCII-only output (no emoji, no diacritics);
@@ -50,7 +50,7 @@ rootfs diff table, the full `/config-mfg` file map) into it.
 ### Step 3 — Scan
 
 ```sh
-cd /home/remoter/mazda-mzd-toolkit-public
+cd /path/to/mazda-mzd-toolkit-public
 sh toolkit/tools/scan-secrets.sh --self-test   # scanner still works?
 sh toolkit/tools/scan-secrets.sh .              # must print CLEAN
 # Dutch residue check (all files):
@@ -72,7 +72,7 @@ git push origin main          # deploy key ~/.ssh/id_github_mzd_deploy
 git tag vX.Y.Z && git push origin vX.Y.Z
 sh toolkit/tools/build-release.sh X.Y.Z /tmp/mzd-rel   # secret-scan gate built in
 # upload the 3 assets via GitHub Releases web UI (deploy key can't create releases)
-# also: cp assets to /home/remoter/file-sharing/uploads/ for files.fles9495.nl
+# also: cp assets to <file-sharing>/uploads/ for your files host
 ```
 
 ## What NEVER goes public
