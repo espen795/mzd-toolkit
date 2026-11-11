@@ -1,0 +1,120 @@
+#!/bin/sh
+# MZD Toolkit - Autorun (v4.8.7: PERSIST-first, USB-free fallback)
+# Started at boot via stage_wifi.sh hook
+
+# v4.8.7/4.8.8: first the persist install, on ALL possible mount paths of
+# data_persist (/mnt, /, /tmp/mnt - varies per boot, see 03-storage.txt),
+# only then USB detection as fallback.
+TOOLKIT_DIR=""
+for PP in /data_persist /mnt/data_persist /tmp/mnt/data_persist; do
+    if [ -f "$PP/mzd-toolkit/menu.sh" ]; then TOOLKIT_DIR="$PP/mzd-toolkit"; break; fi
+done
+if [ -z "$TOOLKIT_DIR" ]; then
+    # v4.8.0: find the USB mount at runtime (sd_nav excluded, toolkit filter)
+    for dev in /tmp/mnt/sd* /mnt/sd*; do
+        [ -d "$dev" ] || continue
+        case "$dev" in *nav*) continue ;; esac
+        if [ -f "$dev/mzd-toolkit/menu.sh" ]; then TOOLKIT_DIR="$dev/mzd-toolkit"; break; fi
+    done
+    [ -z "$TOOLKIT_DIR" ] && for dev in /tmp/mnt/sdb1 /tmp/mnt/sda1 /tmp/mnt/sdc1 /tmp/mnt/sdd1; do
+        [ -f "$dev/mzd-toolkit/menu.sh" ] && { TOOLKIT_DIR="$dev/mzd-toolkit"; break; }
+    done
+fi
+
+# Log to /tmp (RAM)
+LOG=/tmp/mzd-autorun.log
+echo "Autorun started: $(date) toolkit=$TOOLKIT_DIR" > "$LOG"
+
+# Wait until the system is stable
+sleep 15
+
+# Set PATH (/data_persist/dev/bin is the canonical Mazda persist bin dir)
+PATH="/data_persist/dev/bin:/mnt/data_persist/dev/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
+export PATH
+
+# Warning fix flags
+echo "1" > /data_persist/aio/warning_ack 2>/dev/null
+mkdir -p /data_persist/aio 2>/dev/null
+echo "1" > /data_persist/aio/warning_ack 2>/dev/null
+echo "1" > /data_persist/dev/no_warn 2>/dev/null
+
+# Start WiFi via NMS D-Bus (v4.7.5 M6): NEVER our own wpa_supplicant -
+# the CMU already runs wpa_supplicant via NMS (PID 2402+); a second
+# instance gives "Operation not supported" on all wext ioctls.
+if [ -f "$TOOLKIT_DIR/wifi/connect-nms.sh" ]; then
+    echo "Start WiFi connect via NMS..." >> "$LOG"
+    sh "$TOOLKIT_DIR/wifi/connect-nms.sh" >> "$LOG" 2>&1
+elif [ -f "$TOOLKIT_DIR/wifi/connect.sh" ]; then
+    echo "Start WiFi connect (legacy)..." >> "$LOG"
+    sh "$TOOLKIT_DIR/wifi/connect.sh" >> "$LOG" 2>&1
+fi
+
+# M3 (v4.7.5): pubkey from USB -> /data_persist/dev/bin/authorized_keys
+# NEVER /config-mfg (squashfs ro, 128K 100% full - proven 03-storage.txt)
+AK_SRC="$TOOLKIT_DIR/ssh/id_mzd.pub"
+AK_DST="/data_persist/dev/bin/authorized_keys"
+if [ -f "$AK_SRC" ]; then
+    mount -o remount,rw /data_persist 2>/dev/null
+    mkdir -p /data_persist/dev/bin 2>/dev/null
+    touch "$AK_DST" 2>/dev/null
+    if ! grep -qF "$(cat "$AK_SRC" 2>/dev/null)" "$AK_DST" 2>/dev/null; then
+        TMPF="/tmp/ak.$$"
+        cat "$AK_DST" 2>/dev/null > "$TMPF"
+        cat "$AK_SRC" >> "$TMPF" 2>/dev/null
+        cat "$TMPF" > "$AK_DST" 2>/dev/null
+        rm -f "$TMPF"
+    fi
+    chmod 600 "$AK_DST" 2>/dev/null
+    echo "$(date) deploy-key: pubkey in $AK_DST" >> "$LOG"
+    # v4.8.11: also to /tmp/mzd-sshd so our own sshd (start.sh) knows it after reboot
+    if [ -s "$AK_DST" ]; then
+        mkdir -p /tmp/mzd-sshd 2>/dev/null
+        cp "$AK_DST" /tmp/mzd-sshd/authorized_keys 2>/dev/null && chmod 600 /tmp/mzd-sshd/authorized_keys 2>/dev/null
+    fi
+fi
+
+# Start Ethernet dongle (eth1) + SSH pwd auth directly with it
+if [ -f "$TOOLKIT_DIR/net/autostart-eth1-ssh.sh" ]; then
+    echo "Start autostart-eth1-ssh..." >> "$LOG"
+    sh "$TOOLKIT_DIR/net/autostart-eth1-ssh.sh" >> "$LOG" 2>&1
+elif [ -f /data_persist/dev/bin/autostart-eth1-ssh.sh ]; then
+    echo "Start autostart-eth1-ssh (persist)..." >> "$LOG"
+    sh /data_persist/dev/bin/autostart-eth1-ssh.sh >> "$LOG" 2>&1
+fi
+
+# Wait for WiFi
+sleep 5
+
+# Start SSH
+# v4.8.20 BLOCKER FIX: if autostart-eth1-ssh.sh already started a working sshd (port 36000 LISTEN),
+# do NOT run start.sh again (it may kill the working daemon).
+echo "Start SSH..." >> "$LOG"
+if netstat -tln 2>/dev/null | grep -q ":36000 "; then
+    echo "$(date) port 36000 already LISTEN (autostart-eth1-ssh) - do NOT run start.sh again" >> "$LOG"
+elif [ -f "$TOOLKIT_DIR/ssh/start.sh" ]; then
+    sh "$TOOLKIT_DIR/ssh/start.sh" >> "$LOG" 2>&1
+elif [ -n "$TOOLKIT_DIR" ]; then
+    sh "$TOOLKIT_DIR/ssh/start.sh" >> "$LOG" 2>&1
+else
+    echo "$(date) no toolkit found (no persist install, no USB) - SSH not started" >> "$LOG"
+fi
+
+# Firewall (v4.7.5 M6): ONLY port 36000 (THE port, hardware testing. NEVER -P INPUT ACCEPT
+iptables -I INPUT -p tcp --dport 36000 -j ACCEPT 2>/dev/null
+
+# M4 boot-fail rollback trigger (v4.7.5): if after boot no firmware booted
+# within 30s AND there is a v59 backup -> restore + reload
+sleep 15
+if ! dmesg 2>/dev/null | grep -q "firmware booted"; then
+    for BK in /lib/firmware/ti-connectivity/wl128x-fw-4-sr.bin.v59-backup-*; do
+        [ -f "$BK" ] || continue
+        echo "$(date) M4 BOOT-FAIL: restore $BK" >> "$LOG"
+        cp "$BK" /lib/firmware/ti-connectivity/wl128x-fw-4-sr.bin 2>/dev/null
+        rmmod wl12xx_sdio 2>/dev/null; rmmod wl12xx 2>/dev/null; sleep 2
+        insmod /lib/modules/$(uname -r 2>/dev/null || echo 3.0.35)/kernel/drivers/net/wireless/ti/wl12xx/wl12xx_sdio.ko 2>/dev/null || modprobe wl12xx_sdio 2>/dev/null
+        ifconfig wlan0 up 2>/dev/null
+        break
+    done
+fi
+
+echo "Autorun complete: $(date)" >> "$LOG"

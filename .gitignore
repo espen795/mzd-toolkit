@@ -1,0 +1,35 @@
+# ============================================================
+# MZD Toolkit — repo-root .gitignore (public export)
+# Runtime data written to the USB stick root — never commit
+# ============================================================
+mzd-data/
+logs/
+backups/
+*.log
+run.env
+*.seq
+STOP
+.rwtest_common
+
+# Secrets — live only in the USB-stick config dir, NEVER in git
+config/settings.conf
+config/secrets.conf
+toolkit/config/settings.conf
+toolkit/config/secrets.conf
+ssh/id_mzd
+ssh/id_mzd.pub
+toolkit/ssh/id_mzd
+toolkit/ssh/id_mzd.pub
+
+# Raw partition images / dd backups — huge, may contain personal data
+*.img
+*.raw
+*.dd
+
+# Core dumps
+core
+core.*
+
+# Editor/OS cruft
+*~
+.DS_Store
