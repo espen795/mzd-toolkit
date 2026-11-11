@@ -1,0 +1,16 @@
+logs/
+backups/
+*.log
+
+# v4.8.0: runtime data on USB root (mzd-data/) + run-state - never in git
+mzd-data/
+run.env
+*.seq
+STOP
+.rwtest_common
+
+# Secrets NEVER in git (EGM section 5) - only locally on USB/host
+config/settings.conf
+config/secrets.conf
+ssh/id_mzd
+ssh/id_mzd.pub

@@ -1,0 +1,26 @@
+# MZD Toolkit Settings - example (v4.8.0)
+# Copy to $USB_MOUNT/mzd-data/config/settings.conf on the USB root
+# (= $SETTINGS_DIR, located by bootstrap_paths()).
+# Fallback: toolkit/config/settings.conf (old sticks).
+#
+# Path variables are deliberately NOT in here - bootstrap_paths() in
+# lib/common.sh detects the USB mount at runtime (/tmp/mnt/sd*, sd_nav
+# excluded) and sets USB_MOUNT/TOOLKIT_DIR/DATA_DIR/LOG_DIR/etc.
+
+# WiFi network - v4.7.6+: "OPEN" or empty = open network (secType=0)
+WIFI_SSID="YOUR_HOTSPOT_SSID"
+WIFI_PASSWORD="OPEN"
+
+# Password for a secured network? Put that in secrets.conf
+# (WIFI_PASSWORD="..." or MZD_PSK), NEVER here in plain text in git.
+
+# SSH - port 36000 is THE port (design decision)
+SSH_PORT=36000
+SSH_USER="cmu"
+# Password auth: MZD_SSH_PASSWORD in secrets.conf (see secrets.conf.example)
+
+# Log/dump directory names automatically get version + boot_id (CMU clock = 19700101):
+#   $DATA_DIR/logs/v4.8.0-livelogs/b<boot8>/...
+#   $DATA_DIR/logs/v4.8.0-logdumb/b<boot8>/...
+#   $DATA_DIR/logs/runs/v4.8.0-<script>-b<boot8>-r<seq>/...
+DATE_CMD="date +%Y%m%d-%H%M%S"

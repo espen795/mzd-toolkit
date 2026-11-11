@@ -1,0 +1,12 @@
+# Port 36000 is the primary port (design decision)
+Port 36000
+ListenAddress 0.0.0.0
+# SECURITY (review 2026-10-30): root login via SSH key only
+PermitRootLogin yes
+PasswordAuthentication no
+PubkeyAuthentication yes
+AuthorizedKeysFile /tmp/mzd-sshd/authorized_keys /data_persist/dev/bin/authorized_keys
+PermitEmptyPasswords no
+PidFile /tmp/sshd.pid
+LogLevel INFO
+Subsystem sftp /usr/lib/openssh/sftp-server
