@@ -66,6 +66,13 @@ requires opening the unit.
 Once autorun works, see [INSTALL.md](INSTALL.md). The toolkit's `install.sh`
 **extends** the existing autorun hook — it does not create it from scratch.
 
+For the on-screen terminal and menu/UI switching after install, see the
+"Terminal shortcut & switching menu/UI" section in [README.md](../README.md)
+and "Switching between the terminal menu and the normal UI" in
+[INSTALL.md](INSTALL.md) - System & security menu options 4 (start terminal,
+diag code 22), 5 (close terminal / back to UI), 6 (permanent Terminal entry
+in Settings -> System, patch + reboot).
+
 ## Notes for the CMU terminal (no Shift key)
 
 The on-screen terminal has **no Shift key**, so `*` and other shifted

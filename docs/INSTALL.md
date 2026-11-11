@@ -71,7 +71,8 @@ Stick layout after extraction:
 
 - Menu → **System & security → 4. Start terminal (diag code 22)** opens the
   on-screen terminal directly (no GUI patch or reboot needed — uses the MMUI
-  `ReadDTC` D-Bus call with `testId=22`, fallback `/jci/scripts/run-terminal.sh`).
+  `ReadDTC` D-Bus call with `testId=22`, fallbacks `/jci/scripts/run-terminal.sh`
+  and `sh /jci/scripts/systemHooks.sh 22`).
 - Menu → **System & security → 5. Close terminal / back to UI** kills the
   terminal process and returns to the normal UI (`ivi-shell -f "Main"`).
 - Menu → **System & security → 6. Add terminal to settings menu** patches the

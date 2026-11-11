@@ -408,6 +408,10 @@ system_menu() {
                     echo "  /tmp/dbus_service_socket missing - fallback run-terminal.sh:"
                     [ -f /jci/scripts/run-terminal.sh ] && sh /jci/scripts/run-terminal.sh || echo "  run-terminal.sh not found"
                 fi
+                # last-resort fallback (proven on hardware): systemHooks.sh event 22
+                if ! pidof terminal >/dev/null 2>&1 && [ -f /jci/scripts/systemHooks.sh ]; then
+                    sh /jci/scripts/systemHooks.sh 22 2>/dev/null
+                fi
                 pause ;;
             5)
                 echo "Stopping terminal, back to UI..."

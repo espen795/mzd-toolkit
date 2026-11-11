@@ -4,17 +4,23 @@
 # ============================================================
 # Patches /jci/gui/apps/syssettings/js/syssettingsApp.js so a
 # "Terminal" item appears in Settings > System tab.
-# Clicking the item writes a trigger file; our autorun
-# watchdog then runs /jci/scripts/run-terminal.sh (SYSTEM_TERMINAL=22).
+# Clicking the item sends MMUI ReadDTC testId=22 directly (uiaId "diag");
+# MMUI then runs /jci/scripts/startSystemScripts.sh 22 -> systemHooks.sh 22
+# -> run-terminal.sh. No trigger file and no watchdog needed (see step 2c).
 #
-# Mechanisme (v74 source analyse):
+# Mechanism (v74 source analysis):
 #   - SystemTab list is built dynamically in _createDisplayList
 #     (line ~5265-5375): items are set index by index.
-#   - After "About" (index 7) there is room - we push an extra item.
-#   - In _menuItemSelectCallback we add case "SelectTerminal"
-#     which writes a trigger file: /tmp/mzd-terminal-trigger
-#   - Our autorun watchdog (terminal-menu-watchdog.sh) checks this
-#     file and runs: sh /jci/scripts/systemHooks.sh 22
+#   - After "About" (index 7) there is room - we push an extra item with
+#     QUOTED strings: appData : 'SelectTerminal', text1Id : 'Terminal',
+#     itemStyle : 'style01' (unquoted identifiers throw "Undefined variable").
+#   - We also patch the STATIC _SystemTabHelperArray definition with a
+#     "terminal" entry and add a "Terminal" string to every i18n dict
+#     (without them the System tab stays "Loading" forever).
+#   - In _menuItemSelectCallback we add case "SelectTerminal" which calls
+#     framework.sendEventToMmui("diag", "ReadDTC", { payload : { testId : 22 } })
+#     The uiaId MUST be the literal "diag" (testdiag service svcjcitestdiag),
+#     NOT this.uiaId ("syssettings") - otherwise the event is silently dropped.
 #
 # Requires: os_unlock (remount rw of /jci)
 # ============================================================
@@ -102,7 +108,7 @@ if ! grep -q 'MZD-TERMINAL-MENU-PATCHED' "$SYSAPP" 2>/dev/null; then
                 next
             }
             /"about" : *$/ {
-                # statische helper-array def: voeg terminal entry toe na about block
+                # static helper-array def: add terminal entry after the about block
                 print
                 getline; print  # {
                 getline; print  # "index" : 7,
