@@ -42,18 +42,31 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
 ## Requirements
 
 - Mazda Connect CMU with firmware **v59.00.502** (v74 partially supported, see above)
-- **Root access already obtained** — from v59.00.502 onward USB autorun is patched out by Mazda, so autorun must first be re-enabled through a serial/ID7-based method (see *Related projects* below)
+- **Root access already obtained** — from v59.00.502 onward USB autorun is patched out by Mazda, so it must first be re-enabled (MP3/XSS, diagnostic menu, or serial — see [docs/ROOT-ACCESS.md](docs/ROOT-ACCESS.md))
 - A **FAT32-formatted USB stick** (MBR partition table); the CMU has `tar`+`gzip` but **no `unzip`** — always use the `.tar.gz` release on the car
 - A PC to prepare the stick and to SSH from
 
 ## Quick start
 
+> **Step 0 — root first.** This toolkit does NOT root the CMU. On firmware
+> v59.00.502+ USB autorun is patched by Mazda — enable it first via the
+> **MP3/XSS workaround**, the **Diagnostic menu → JCI Test Mode**, or **UART
+> serial**. Full details + exact USB layout: **[docs/ROOT-ACCESS.md](docs/ROOT-ACCESS.md)**.
+
 1. On a PC, download the latest `mzd-toolkit-vX.Y.Z.tar.gz` (+ `SHA256SUMS`) from the Releases page.
 2. Verify the checksum: `sha256sum -c SHA256SUMS`
 3. Format a USB stick as **FAT32 (MBR)** and extract the archive to the stick root:
    `tar -xzf mzd-toolkit-vX.Y.Z.tar.gz -C /mnt/usb/` → creates `mzd-toolkit/`
-4. Start the car with the stick inserted. The autorun hook executes `install.sh`/`menu.sh` automatically; wait 1–2 minutes for the menu.
+4. Start the car with the stick inserted. The existing autorun hook fires
+   `install.sh`; **the menu does not autostart — start it manually**:
+   ```sh
+   sh /data_persist/mzd-toolkit/menu.sh     # after persist-install (no stick needed)
+   sh /tmp/mnt/sd*/mzd-toolkit/menu.sh      # from USB — glob, the CMU terminal has no Shift key
+   ```
+   What *does* autostart on every boot: WiFi connect, SSH on 36000, eth1 dongle.
 5. In the menu choose **3. All-in-one: WiFi + SSH + watchdog** — or drive the pieces individually.
+   Menu is **numeric-only** (type a number). Switch menu ↔ UI: System & security →
+   **4** starts the on-screen terminal (diag code 22, no patch needed), **5** closes it back to the UI.
 6. From your PC:
    ```sh
    ssh -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o PubkeyAcceptedAlgorithms=+ssh-rsa \
