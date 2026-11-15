@@ -110,6 +110,13 @@ See [docs/INSTALL.md](docs/INSTALL.md) for the full walkthrough and [docs/USAGE.
 - **WiFi passwords are never passed as command-line arguments** (visible in `/proc/<pid>/cmdline`) — use `MZD_PSK` env var or `secrets.conf`.
 - **Never commit secrets.** `config/secrets.conf`, `config/settings.conf`, and `ssh/id_mzd*` are gitignored, and `tools/build-release.sh` fails the build if any of them end up in a release asset.
 - USB sticks get corrupt on this system (FAT errors, `LOST.DIR` are proven in logs) — always verify `SHA256SUMS`, and reformat the stick if you see `LOST.DIR`.
+- **Brick risk:** never point a service in `/jci/sm/sm.conf` at a shell script
+  (the service manager `dlopen()`s it → ELF mismatch → `reset_board="yes"` →
+  watchdog bootloop). Keep a `sm.conf.bak`. If the unit is already in a
+  bootloop, software rescue routes (serial `user` shell, USB autorun,
+  bootloader break-key) are **proven dead** on stock v59 — the working recovery
+  is an SPI-NOR boot-select flip with a CH341A programmer. Full analysis:
+  **[docs/RECOVERY-BRICK.md](docs/RECOVERY-BRICK.md)**.
 
 ## How this was built
 
@@ -128,6 +135,7 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 - [docs/USAGE.md](docs/USAGE.md) — menu, all scripts, exit codes, SSH client commands
 - [docs/PUBLISH-PIPELINE.md](docs/PUBLISH-PIPELINE.md) — how this repo is published from internal research (translation + secret scan + deploy key)
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — known failure modes and fixes
+- [docs/RECOVERY-BRICK.md](docs/RECOVERY-BRICK.md) — bootloop rescue: root cause, dead ends (serial/USB/bootloader), SPI-NOR CH341A recovery, prevention checklist
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — CMU internals (GUI, D-Bus, partitions, autorun)
 - [docs/TESTING.md](docs/TESTING.md) — what was tested on real hardware
 - [CHANGELOG.md](CHANGELOG.md) — version history
