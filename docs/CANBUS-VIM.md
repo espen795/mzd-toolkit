@@ -186,7 +186,45 @@ CAN status enums used by `dataRetrieval`: `CAN_NONE`, `CAN_INACTIVE`,
 `CAN_ACTIVE`, `CAN_BUS_OFF`, `CAN_MAX` (via `GetPublicCanStatus()` /
 `GetPrivateCanStatus()`).
 
-## 6. Toolkit scripts
+## 6. Can the CMU transmit on CAN? (VIP reverse engineering)
+
+Short answer: **the VIP coprocessor owns the CAN controllers and does CAN-TX,
+but there is no proven raw-CAN injection path from the CMU.** The CMU can only
+transmit via fixed, firmware-defined messages or via UDS. Full report with
+evidence levels: [VIP-FIRMWARE-RE.md](VIP-FIRMWARE-RE.md).
+
+The VIP (Renesas M16C R5F35MCEJFB) writes directly to the M16C CAN SFR block
+(0xD400-0xD7FF: mailbox ID registers 0xD500/0xD5F5/0xD6F5, MCTL/TRQ 0xD7A6,
+C0CTLR 0xD7C0, C0CLKR 0xD7C7) as MOV operands in its firmware -- so CAN-TX is
+real. But the SPI dispatch table at 0xC0820 (512 entries, 0xFFFF = empty) has
+handlers only for the documented control/key/GPIO/vehicle-data message IDs;
+**no handler exists for a "transmit arbitrary CAN frame" command**. Known TX
+CAN IDs appear as fixed immediates in the VIP firmware: 0x480-0x49C (settings
+Set messages), 0x4F2/0x4F3 (HUD config), 0x7DF/0x7E0 (UDS request/response).
+
+The proven Linux-side chain is:
+
+```
+D-Bus com.jci.vbs.*  ->  svcjcivbs.so (VBS core)  ->  vbs-mod-wrapper
+  ->  mod_can (libjcimod_can.so)  ->  vim_app (IPC TX queue, IUC_QueueTxMessage)
+  ->  SPI_Transfer on /dev/spidev1.0 (20-byte frames)  ->  VIP  ->  CAN mailbox + MCTL TRQ
+```
+
+Practical TX paths from the CMU:
+
+| Path | CAN-TX? | Notes |
+|---|---|---|
+| Raw SPI frame with self-chosen CAN ID/data | not proven | dispatch table 0xC0820 has no such handler (handler bodies not fully traceable without an M16C disassembler) |
+| `com.jci.vbs.diag` (`GenericMessage_Request`, `Routine_Request`, `Data_Request`, `SetFault_Request`) | yes, via UDS 0x7DF/0x7E0, not raw CAN | 0x7DF is a broadcast request to the powertrain ECUs; wrong routines can reset ECUs |
+| settings/HUD (`com.jci.settings.Set_Settings_U8`, `SetHUDSetting`) | yes, fixed IDs 0x480-0x49C / 0x4F2 | comfort writes |
+| radio/cd/am/vdt D-Bus modules | yes, fixed per-module ID set | private CAN 0x3xx/0x4xx |
+| SocketCAN `cansend` | no | `# CONFIG_CAN is not set` |
+
+Risks when writing: a malformed SPI frame can reset the VIP and take the CMU
+with it (`reset_board="yes"` on jciVBS); wrong TX traffic on the private 125k
+bus can push the VIP into bus-off. See VIP-FIRMWARE-RE.md section 6.
+
+## 7. Toolkit scripts
 
 All in `toolkit/tools/`, all using the service-bus address:
 
@@ -197,6 +235,12 @@ All in `toolkit/tools/`, all using the service-bus address:
 | `vehicle-data.sh` | polls the common getters (speed, gear, wheels, SOC, …) |
 | `dbus-introspect.sh` | `org.freedesktop.DBus.Introspectable.Introspect` on a chosen service |
 | `can-bus.sh` / `vim-deep-dive.sh` | deeper VIM/VBS exploration |
+
+For raw CAN capture/decode on setups that expose a `can*` interface, see
+`toolkit/tools/can/` (`can-watch.sh`, `can-capture.sh`, `can-sniff.sh`,
+`can-log.sh`, `kcd_decode.py`, `can-summary.py`); the CAN database itself is
+fetched from upstream because it has no redistribution license (see
+`toolkit/tools/can/README.md`).
 
 Quick manual checks on the car:
 
@@ -212,7 +256,7 @@ dbus-send --address="unix:path=/tmp/dbus_service_socket" --print-reply \
 hexdump -C /dev/shm/smdb_vdm_vdt_current_data | head
 ```
 
-## 7. Limitations & safety
+## 8. Limitations & safety
 
 - **Passive reading only.** The practical, safe path is D-Bus signals/methods
   (everything the CMU itself uses is exposed there — `dataRetrieval` proves it).

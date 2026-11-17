@@ -135,7 +135,13 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 - [docs/USAGE.md](docs/USAGE.md) — menu, all scripts, exit codes, SSH client commands
 - [docs/PUBLISH-PIPELINE.md](docs/PUBLISH-PIPELINE.md) — how this repo is published from internal research (translation + secret scan + deploy key)
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — known failure modes and fixes
-- [docs/RECOVERY-BRICK.md](docs/RECOVERY-BRICK.md) — bootloop rescue: root cause, dead ends (serial/USB/bootloader), SPI-NOR CH341A recovery, prevention checklist
+- [docs/RECOVERY-BRICK.md](docs/RECOVERY-BRICK.md) — bootloop rescue: verified serial recovery (factory `cmu`/`mzd` login, sm.conf `.so` fix), dead ends, prevention checklist; tool in [tools/recovery/](tools/recovery/)
+- [docs/NOR-FLASH-RECOVERY.md](docs/NOR-FLASH-RECOVERY.md) — CH341A SPI-NOR dump/restore runbook (last resort)
+- [docs/CANBUS-VIM.md](docs/CANBUS-VIM.md) + [toolkit/tools/can/](toolkit/tools/can/) — CAN bus, VIM/VIP, sniff/log/decode tools
+- [docs/VIP-FIRMWARE-RE.md](docs/VIP-FIRMWARE-RE.md) — can the CMU transmit on CAN? VIP (M16C) reverse engineering + [research/vip-firmware/](research/vip-firmware/)
+- [docs/VEHICLE-DATA-DBUS.md](docs/VEHICLE-DATA-DBUS.md) — vehicle data over D-Bus (corrected scales), `toolkit/tools/autolog.sh`, [tools/trip-analysis/](tools/trip-analysis/)
+- [docs/HARDWARE.md](docs/HARDWARE.md) / [docs/FIRMWARE.md](docs/FIRMWARE.md) — part numbers, connector pinout, v59 vs v74, v74 update procedure
+- [docs/CMU-SWAP-COMPATIBILITY.md](docs/CMU-SWAP-COMPATIBILITY.md) — which CMU units can be swapped in
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — CMU internals (GUI, D-Bus, partitions, autorun)
 - [docs/TESTING.md](docs/TESTING.md) — what was tested on real hardware
 - [CHANGELOG.md](CHANGELOG.md) — version history

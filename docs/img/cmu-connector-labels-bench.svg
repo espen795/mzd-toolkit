@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="760" viewBox="0 0 900 760" font-family="Arial, Helvetica, sans-serif">
+  <!-- Original drawing by the mzd-toolkit project (CC0 1.0).
+       Pin functions cross-checked against github.com/silverchris/mazda-cmu-documentation
+       hardware.md (connector listed there as Sumitomo 6098-5611, unverified). -->
+  <rect width="900" height="760" fill="#1a1a1a"/>
+
+  <!-- PANEL 1: wire-side view -->
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#ffffff">1) PLUG DETACHED - wire side (rear of plug), latch UP</text>
+  <rect x="330" y="42" width="240" height="12" rx="4" fill="#e8c832"/>
+  <rect x="80" y="60" width="740" height="200" rx="12" fill="#f0ece2" stroke="#999" stroke-width="2"/>
+  <g font-size="11" text-anchor="middle">
+    <rect x="96"  y="70"  width="62" height="70" rx="6" fill="#d8d8d8"/><text x="127" y="86" fill="#555">2A</text><text x="127" y="110" font-weight="bold" fill="#333">-</text>
+    <rect x="164" y="70"  width="62" height="70" rx="6" fill="#d8d8d8"/><text x="195" y="86" fill="#555">2B</text><text x="195" y="110" font-weight="bold" fill="#333">-</text>
+    <rect x="232" y="70"  width="62" height="70" rx="6" fill="#222"/><text x="263" y="86" fill="#aaa">2C</text><text x="263" y="112" font-size="14" font-weight="bold" fill="#fff">GND</text>
+    <rect x="300" y="70"  width="62" height="70" rx="6" fill="#222"/><text x="331" y="86" fill="#aaa">2D</text><text x="331" y="112" font-size="14" font-weight="bold" fill="#fff">GND</text>
+    <rect x="368" y="70"  width="62" height="70" rx="6" fill="#3a6ea5"/><text x="399" y="86" fill="#cfe0f5">2E</text><text x="399" y="108" font-size="11" font-weight="bold" fill="#fff">CAN-H</text>
+    <rect x="436" y="70"  width="62" height="70" rx="6" fill="#3a6ea5"/><text x="467" y="86" fill="#cfe0f5">2F</text><text x="467" y="108" font-size="11" font-weight="bold" fill="#fff">CAN-L</text>
+    <rect x="504" y="70"  width="62" height="70" rx="6" fill="#d8d8d8"/><text x="535" y="86" fill="#555">2G</text><text x="535" y="110" font-weight="bold" fill="#333">-</text>
+    <rect x="572" y="70"  width="62" height="70" rx="6" fill="#d8d8d8"/><text x="603" y="86" fill="#555">2H</text><text x="603" y="110" font-weight="bold" fill="#333">-</text>
+    <rect x="640" y="70"  width="62" height="70" rx="6" fill="#5b8c5a"/><text x="671" y="86" fill="#dff0df">2I</text><text x="671" y="105" font-size="10" font-weight="bold" fill="#fff">LOCCAN</text>
+    <rect x="708" y="70"  width="62" height="70" rx="6" fill="#b03a8c"/><text x="739" y="86" fill="#f5d8ea">2S</text><text x="739" y="112" font-size="14" font-weight="bold" fill="#fff">TX</text><text x="739" y="130" font-size="8" fill="#f5d8ea">empty</text>
+    <rect x="96"  y="160" width="62" height="70" rx="6" fill="#5b8c5a"/><text x="127" y="176" fill="#dff0df">2J</text><text x="127" y="198" font-size="10" font-weight="bold" fill="#fff">LOCCAN</text>
+    <rect x="164" y="160" width="62" height="70" rx="6" fill="#7a6a3a"/><text x="195" y="176" fill="#efe8d8">2K</text><text x="195" y="198" font-size="12" font-weight="bold" fill="#fff">LIN</text>
+    <rect x="232" y="160" width="62" height="70" rx="6" fill="#222"/><text x="263" y="176" fill="#aaa">2L</text><text x="263" y="200" font-size="14" font-weight="bold" fill="#fff">GND</text>
+    <rect x="300" y="160" width="62" height="70" rx="6" fill="#d8d8d8"/><text x="331" y="176" fill="#555">2M</text><text x="331" y="200" font-weight="bold" fill="#333">-</text>
+    <rect x="368" y="160" width="62" height="70" rx="6" fill="#d8d8d8"/><text x="399" y="176" fill="#555">2N</text><text x="399" y="200" font-weight="bold" fill="#333">-</text>
+    <rect x="436" y="160" width="62" height="70" rx="6" fill="#8c5a2b"/><text x="467" y="176" fill="#f0e0d0">2O</text><text x="467" y="198" font-size="10" font-weight="bold" fill="#fff">RS485+</text>
+    <rect x="504" y="160" width="62" height="70" rx="6" fill="#8c5a2b"/><text x="535" y="176" fill="#f0e0d0">2P</text><text x="535" y="198" font-size="10" font-weight="bold" fill="#fff">RS485-</text>
+    <rect x="572" y="160" width="62" height="70" rx="6" fill="#c0392b"/><text x="603" y="176" fill="#f5d5d0">2Q</text><text x="603" y="200" font-size="14" font-weight="bold" fill="#fff">ACC</text><text x="603" y="220" font-size="8" fill="#f5d5d0">pink</text>
+    <rect x="640" y="160" width="62" height="70" rx="6" fill="#1a5276"/><text x="671" y="176" fill="#d0e0f0">2R</text><text x="671" y="200" font-size="14" font-weight="bold" fill="#fff">B+</text><text x="671" y="220" font-size="8" fill="#d0e0f0">blue</text>
+    <rect x="708" y="160" width="62" height="70" rx="6" fill="#b03a8c"/><text x="739" y="176" fill="#f5d8ea">2T</text><text x="739" y="200" font-size="14" font-weight="bold" fill="#fff">RX</text><text x="739" y="220" font-size="8" fill="#f5d8ea">empty</text>
+  </g>
+  <text x="450" y="285" text-anchor="middle" font-size="12" fill="#cccccc">here: black GND left | blue B+ right | pink ACC lower right | TX/RX = empty cavities on the right</text>
+
+  <!-- arrow -->
+  <text x="450" y="318" text-anchor="middle" font-size="22" fill="#e8c832">|  plugged into the car, viewed from above/front = MIRROR IMAGE  |</text>
+
+  <!-- PANEL 2: mated top view (mirrored) -->
+  <text x="450" y="350" text-anchor="middle" font-size="18" font-weight="bold" fill="#ffffff">2) PLUGGED INTO THE CMU - viewed from above</text>
+  <rect x="80" y="362" width="740" height="200" rx="12" fill="#dfe9f5" stroke="#7aa" stroke-width="2"/>
+  <rect x="330" y="556" width="240" height="12" rx="4" fill="#e8c832"/>
+  <text x="450" y="566" text-anchor="middle" font-size="10" font-weight="bold" fill="#1a1a1a">latch (bottom of image)</text>
+  <g font-size="11" text-anchor="middle">
+    <!-- mirrored: 2S on left ... 2A on right -->
+    <rect x="96"  y="372" width="62" height="70" rx="6" fill="#b03a8c"/><text x="127" y="388" fill="#f5d8ea">2S</text><text x="127" y="414" font-size="14" font-weight="bold" fill="#fff">TX</text><text x="127" y="432" font-size="8" fill="#f5d8ea">empty</text>
+    <rect x="164" y="372" width="62" height="70" rx="6" fill="#5b8c5a"/><text x="195" y="388" fill="#dff0df">2I</text><text x="195" y="407" font-size="10" font-weight="bold" fill="#fff">LOCCAN</text>
+    <rect x="232" y="372" width="62" height="70" rx="6" fill="#d8d8d8"/><text x="263" y="388" fill="#555">2H</text><text x="263" y="412" font-weight="bold" fill="#333">-</text>
+    <rect x="300" y="372" width="62" height="70" rx="6" fill="#d8d8d8"/><text x="331" y="388" fill="#555">2G</text><text x="331" y="412" font-weight="bold" fill="#333">-</text>
+    <rect x="368" y="372" width="62" height="70" rx="6" fill="#3a6ea5"/><text x="399" y="388" fill="#cfe0f5">2F</text><text x="399" y="410" font-size="11" font-weight="bold" fill="#fff">CAN-L</text>
+    <rect x="436" y="372" width="62" height="70" rx="6" fill="#3a6ea5"/><text x="467" y="388" fill="#cfe0f5">2E</text><text x="467" y="410" font-size="11" font-weight="bold" fill="#fff">CAN-H</text>
+    <rect x="504" y="372" width="62" height="70" rx="6" fill="#222"/><text x="535" y="388" fill="#aaa">2D</text><text x="535" y="414" font-size="14" font-weight="bold" fill="#fff">GND</text>
+    <rect x="572" y="372" width="62" height="70" rx="6" fill="#222"/><text x="603" y="388" fill="#aaa">2C</text><text x="603" y="414" font-size="14" font-weight="bold" fill="#fff">GND</text>
+    <rect x="640" y="372" width="62" height="70" rx="6" fill="#d8d8d8"/><text x="671" y="388" fill="#555">2B</text><text x="671" y="412" font-weight="bold" fill="#333">-</text>
+    <rect x="708" y="372" width="62" height="70" rx="6" fill="#d8d8d8"/><text x="771" y="388" fill="#555">2A</text><text x="771" y="412" font-weight="bold" fill="#333">-</text>
+    <rect x="96"  y="462" width="62" height="70" rx="6" fill="#b03a8c"/><text x="127" y="478" fill="#f5d8ea">2T</text><text x="127" y="504" font-size="14" font-weight="bold" fill="#fff">RX</text><text x="127" y="522" font-size="8" fill="#f5d8ea">empty</text>
+    <rect x="164" y="462" width="62" height="70" rx="6" fill="#1a5276"/><text x="195" y="478" fill="#d0e0f0">2R</text><text x="195" y="504" font-size="14" font-weight="bold" fill="#fff">B+</text><text x="195" y="524" font-size="8" fill="#d0e0f0">blue</text>
+    <rect x="232" y="462" width="62" height="70" rx="6" fill="#c0392b"/><text x="263" y="478" fill="#f5d5d0">2Q</text><text x="263" y="504" font-size="14" font-weight="bold" fill="#fff">ACC</text><text x="263" y="524" font-size="8" fill="#f5d5d0">pink</text>
+    <rect x="300" y="462" width="62" height="70" rx="6" fill="#8c5a2b"/><text x="331" y="478" fill="#f0e0d0">2P</text><text x="331" y="500" font-size="10" font-weight="bold" fill="#fff">RS485-</text>
+    <rect x="368" y="462" width="62" height="70" rx="6" fill="#8c5a2b"/><text x="399" y="478" fill="#f0e0d0">2O</text><text x="399" y="500" font-size="10" font-weight="bold" fill="#fff">RS485+</text>
+    <rect x="436" y="462" width="62" height="70" rx="6" fill="#d8d8d8"/><text x="467" y="478" fill="#555">2N</text><text x="467" y="502" font-weight="bold" fill="#333">-</text>
+    <rect x="504" y="462" width="62" height="70" rx="6" fill="#d8d8d8"/><text x="535" y="478" fill="#555">2M</text><text x="535" y="502" font-weight="bold" fill="#333">-</text>
+    <rect x="572" y="462" width="62" height="70" rx="6" fill="#222"/><text x="603" y="478" fill="#aaa">2L</text><text x="603" y="504" font-size="14" font-weight="bold" fill="#fff">GND</text>
+    <rect x="640" y="462" width="62" height="70" rx="6" fill="#7a6a3a"/><text x="671" y="478" fill="#efe8d8">2K</text><text x="671" y="500" font-size="12" font-weight="bold" fill="#fff">LIN</text>
+    <rect x="708" y="462" width="62" height="70" rx="6" fill="#5b8c5a"/><text x="771" y="478" fill="#dff0df">2J</text><text x="771" y="497" font-size="10" font-weight="bold" fill="#fff">LOCCAN</text>
+  </g>
+  <text x="450" y="595" text-anchor="middle" font-size="12" fill="#cccccc">here: thick black GND right | blue B+ left | pink ACC lower left | TX/RX empty cavities left</text>
+
+  <!-- legend -->
+  <text x="450" y="625" text-anchor="middle" font-size="13" font-weight="bold" fill="#e8c832">COLORS ARE AUTHORITATIVE, NOT LEFT/RIGHT: black = GND | blue = B+ (12V constant) | pink = ACC (12V switched)</text>
+  <text x="450" y="650" text-anchor="middle" font-size="12" fill="#cccccc">Test order: GND continuity &lt;1 ohm -> B+ always ~12V -> ACC: 0V ignition off / ~12V in ACC position</text>
+  <text x="450" y="675" text-anchor="middle" font-size="12" fill="#999">TX/RX (2S/2T) = 3.3V UART console, bench only - in the car those cavities are empty</text>
+  <text x="450" y="705" text-anchor="middle" font-size="11" fill="#777">Source: own bench measurements on a Gen-1 CMU-150 | pin table: github.com/silverchris/mazda-cmu-documentation hardware.md (Sumitomo 6098-5611, unverified)</text>
+</svg>

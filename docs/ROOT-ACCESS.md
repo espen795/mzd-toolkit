@@ -85,3 +85,130 @@ cd /tmp/mnt/sd*    # expands to /tmp/mnt/sda1 (or sdb1, ...)
 
 The toolkit menu itself is **numeric-only** for the same reason — you type a
 number, not a letter.
+
+---
+
+# Root access per firmware version (research 2026-11)
+
+The methods above (MP3/XSS, diagnostic menu, UART) are the classic ones. The
+table below summarizes what the stock firmware itself offers per version, based
+on a live v59.00.502A EU N unit **verified on real hardware** and a v74 rootfs
+image **analyzed offline** (file-level strings/hexdump; not booted). Items are
+marked **[verified]** (live unit) or **[reported]** (image analysis / community
+reports, not independently confirmed).
+
+## 1. Version matrix
+
+| Firmware | sshd in stock rootfs | Root route | Notes |
+|---|---|---|---|
+| v30-v55 | no | serial console exploit or USB autorun (if present) | no sshd binary in rootfs; tweaks need manual install |
+| v55-v59 | **yes** | SSH on port **36000**, pubkey-only via `/config-mfg/authorized_keys`, login user `cmu` is **uid 0** | stock `sshd_config`: `PermitRootLogin yes`, `PasswordAuthentication no` |
+| v70+ | yes | same as v59; sshd_config unchanged | single-file `.up` (no separate failsafe.up) |
+| v74 | yes | same as v59; sshd_config **byte-identical** to v59 **[verified by image diff]** | `jci-autorun` USB hook string confirmed in the v74 binary @ `0xa962ad0` **[reported]** |
+
+Proof that v59 and v74 sshd configs are identical: the rootfs diff found
+`sshd_config` byte-identical in both images (see FIRMWARE.md section 3).
+
+## 2. What survives a firmware update
+
+| Component | Location | Survives a `.up` update? | Note |
+|---|---|---|---|
+| `/config-mfg` (authorized_keys, passwd, wl1271-nvs.bin, fgsn.dat) | NOR flash `mtdblock5` (read-only) | **yes** - never overwritten by `.up` | SSH keys keep working after every update |
+| `sshd_config` (`/etc/ssh/`) | rootfs `/dev/ffx01p1` | identical in v59 and v74 | port 36000, PermitRootLogin yes, key-only |
+| `cmu` user (uid 0) | `/etc/passwd` in rootfs | present in both | `cmu:...:0:0:root:/root:/bin/sh` |
+| `/data_persist` (autorun, toolkit, keys) | eMMC `/dev/mmcblk0p2` | **update.up: yes** / **reinstall.up: may be wiped** | a `.up` can contain `cleandatapersist/` -> wipes `/mnt/data_persist/` |
+| NOR fail-safe image | SPI-NOR `mtd` "fail-safe" | only via explicit `fail-safe/` dir in a `.up` | not in the eMMC backup |
+| VFBL bootloader | SPI-NOR @ 0x10000 | only via `bootstrap/` dir in a `.up` | not in the eMMC backup |
+
+**Practical consequence:** after any firmware update (e.g. v59 -> v74), SSH
+root on port 36000 keeps working automatically as long as
+`/config-mfg/authorized_keys` is intact (it lives in NOR flash and is never
+overwritten). After a `reinstall.up`, `/data_persist` may be wiped
+(`cleandatapersist/`) - redeploy the autorun/toolkit via the `jci-autorun` USB
+hook or manually over SSH. After an incremental `update.up`, `/data_persist`
+is preserved.
+
+## 3. The `.up` package format
+
+A Mazda `.up` file is a **password-protected ZIP plus a 256-byte SHA256
+signature appended as the last 256 bytes** **[reported, from community
+analysis of update packages]**:
+
+| Part | Description |
+|---|---|
+| ZIP password | `5X/9vAVhovyU2ygK` (widely known in the community) - allows opening the ZIP for analysis |
+| Signature | last 256 bytes = SHA256, verified against `publisher_cert.pem` |
+| Cert chain | `jci_root_cert.pem` (in rootfs `/jci/certificates/`) -> `jci_subord_cert.pem` -> `publisher_cert.pem` (both in the ZIP) |
+| Verification steps | 1. root cert integrity -> 2. subord vs root -> 3. publisher vs subord -> 4. signature vs publisher |
+
+ZIP contents (driven by `main_instructions.ini`):
+
+| Dir/File | Required | Function |
+|---|---|---|
+| `main_instructions.ini` | yes | `[Settings]`/`[Instructions]`/`[DataStorage]` - operations: Execute, ImageUpdate, FileUpdate |
+| `jci_subord_cert.pem`, `publisher_cert.pem` | yes | update certificates |
+| `versions.ini.gz` | optional | version compatibility |
+| `rootfs1upd/`, `linux1/` | optional | rootfs / main kernel update (ImageUpdate) |
+| `bootstrap/`, `ibc1/`, `ibc2/`, `fail-safe/` | optional | SPI-NOR updates |
+| `vip/`, `gps/` | optional | VIP coprocessor / GPS firmware |
+| `passwdupdate/` | optional | scripts to update `/etc/passwd` and `authorized_keys` |
+| `cleandatapersist/` | optional | **wipes `/mnt/data_persist/`** - autorun/toolkit/keys are lost on reinstall |
+| `usersettingsbackup/` / `usersettingscleanup/` / `usersettingsrestore/` | optional | user settings backup/restore during update |
+| `resources/`, `preloaddata/`, `compactwnn/`, `getnewflavour/`, `checksumoption/` | optional | misc |
+
+**Can you modify a `.up`? No.** The 256-byte signature is verified through the
+4-step certificate chain; without Mazda's private signing keys a modified `.up`
+cannot be re-signed and the CMU refuses unsigned packages. Opening the ZIP
+with the known password for analysis is fine; repacking without a valid
+signature is rejected.
+
+**Region lock:** firmware is region-locked via SKU files
+(`/jci_mazda/sku_na.ini`, `sku_eu.ini`, ... - new in v74) and
+`JCI_SW_FLAVOR` in the version data (`NA` for NA builds). Flashing a NA `.up`
+on an EU unit is rejected or bricks the unit - always use the `.up` matching
+your car's region.
+
+## 4. Serial console (UART) per version
+
+| Firmware | Login | Shell | Note |
+|---|---|---|---|
+| v59 **[verified live]** | `user`/`jci` accepted; `root`/`cmu` -> "Login incorrect" | `/bin/shsshd` in passwd is broken, session closes immediately | IBC bootloader 1.68.17 does not accept a break over serial |
+| v74 **[reported, image analysis]** | `user:...:1000:...:/bin/shsshd` - same broken shell; `cmu:...:0:0:root:/root:/bin/sh` has a valid shell but serial login is refused | same | - |
+
+**Conclusion:** the serial console login is a dead end for shell access in
+both v59 and v74 - `/bin/shsshd` does not exist as a binary. The remaining
+routes are: SSH (port 36000, pubkey), the `jci-autorun` USB hook, or hardware
+(SPI-NOR flashing via CH341A / UART boot-select flip).
+
+The factory-default serial credentials that are identical on every unit
+(`cmu`/`mzd`, `root`/`jci`) may be documented for recovery purposes; on v59/v74
+they do not yield a working shell over serial as described above.
+
+## 5. USB autorun hook (`jci-autorun`)
+
+- `updatea_sys_srv` scans a mounted USB partition for a file named
+  **`jci-autorun`** in the root of the partition.
+- If found: `system("(cd <mountdir> && jci-autorun) &")` - executed as **root
+  without login**.
+- The string `jci-autorun` at `0xa962ad0` in the v74 binary - confirmed present
+  **[reported]**.
+- Observed live at t ~7.7 s during boot (before a watchdog crash at ~10 s)
+  **[verified]**.
+- This is the primary "root without SSH" route during/after firmware updates.
+- Related: the stock rootfs also contains `start_eth1_dhcp.sh` (v74), so eth1
+  support is built into the firmware itself **[reported]**.
+
+## 6. Backup vs `.up` - why a raw backup is not flashable
+
+| | Raw backup (dd of block device) | `.up` file |
+|---|---|---|
+| Format | MAST container (raw block device) | password-protected ZIP + SHA256 signature |
+| Signed | no | yes - cert chain root -> subord -> publisher |
+| Flashable via REFLASH | **no** - not a `.up` container | yes |
+| Usable for | analysis, file-level restore, diff | official firmware update / recovery |
+| Restoring a raw `dd` | **high brick risk** (no A/B switch, no rollback) | n/a |
+
+A modified `.up` cannot be made "standard root + eth1 SSH" - signing makes
+that impossible. Instead use `jci-autorun` on USB plus
+`/data_persist/dev/bin/autorun` to configure eth1 and sshd automatically after
+every boot.
