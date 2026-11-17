@@ -122,7 +122,89 @@ The unit can unexpectedly reboot under heavy load or idle detection. For long
 operations (full `dd` backups, big copies) disable it first, and re-enable
 afterwards.
 
-## 7. SPI / VIM chip
+## 7. Connectors and part numbers
+
+### Main power/communication connector: 0920-201B
+
+The CMU's main harness plug is the **0920-201B** (Sumitomo 6098-5611,
+unverified) - 20 cavities in a 2x10 grid, numbered `2A`-`2T` (top row
+`2A..2S` odd letters, bottom row `2B..2T` even letters when viewed from the
+wire side with the latch up). Pinout, verified on a bench harness and
+cross-checked against the community pin table
+([silverchris/mazda-cmu-documentation](https://github.com/silverchris/mazda-cmu-documentation),
+`hardware.md`):
+
+| Pin | Function | Wire color (typical) |
+|---|---|---|
+| 2A | (empty) | - |
+| 2B | (empty) | - |
+| 2C | **GND** | black (thick) |
+| 2D | **GND** | black (thick) |
+| 2E | **HS-CAN H** | - |
+| 2F | **HS-CAN L** | - |
+| 2G | (empty) | - |
+| 2H | (empty) | - |
+| 2I | **Local CAN** (LOCCAN) | - |
+| 2J | **Local CAN** (LOCCAN) | - |
+| 2K | **LIN** | blue |
+| 2L | **GND** | black |
+| 2M | (empty) | - |
+| 2N | (empty) | - |
+| 2O | **RS485+ to TAU** | - |
+| 2P | **RS485- to TAU** | - |
+| 2Q | **ACC** (12V switched) | pink/purple |
+| 2R | **B+** (12V constant) | blue |
+| 2S | **UART TX** (3.3V console, 115200 8N1) | empty in factory harness |
+| 2T | **UART RX** (3.3V console, 115200 8N1) | empty in factory harness |
+
+Notes:
+
+- **Wire colors are authoritative, not left/right positions.** When the plug is
+  mated in the car and viewed from above/front, the image is mirrored relative
+  to the wire-side view.
+- Bench test order: GND continuity <1 ohm -> B+ always ~12V -> ACC 0V with
+  ignition off / ~12V in ACC position.
+- `2S`/`2T` (UART TX/RX) are **empty cavities in the factory harness** - they
+  are only wired on a bench for the 3.3V serial console. See
+  [ROOT-ACCESS.md](ROOT-ACCESS.md) section 4 for why serial login is a dead end
+  on v59/v74 anyway.
+- See the pinout drawings:
+  [wire-side view](img/cmu-connector-201B-wireside.svg) and
+  [bench label diagram, both views](img/cmu-connector-labels-bench.svg)
+  (original drawings, CC0).
+
+### USB connector: 0920-201D
+
+| Pin | Function |
+|---|---|
+| 4A | GND |
+| 4B | Data+ |
+| 4C | 5V |
+| 4D | Data- |
+
+### Part numbers seen on Gen-1 units
+
+Part numbers are safe to publish (they are model/trim codes, not unit-unique):
+
+| Part | Example part number | Notes |
+|---|---|---|
+| CMU (Connectivity Master Unit) | `BPN2 66 9C0C`, `BHP1 66 9C0K`, ... | prefix encodes model/trim/region/sound system, suffix = hardware revision; see CMU-SWAP-COMPATIBILITY.md |
+| Display unit | `BHP1 61 1J0D` | separate part from the CMU; stays in the car during a CMU swap |
+| USB hub (wired CarPlay/Android Auto) | `TK78 66 9U0C` | proven retrofit route |
+
+The label on a CMU also carries unit-unique data - **serial number, Bluetooth
+and WiFi MAC addresses, VIN** - which is deliberately **not** reproduced here.
+The Bluetooth and WiFi MAC of a unit differ only in the last byte
+(WiFi = BT + 1); after a CMU swap the MACs change, which matters for phone
+pairings. The display and CMU are separate parts: a CMU swap keeps your own
+display.
+
+Certification marks on a world-market label include E9 (EU type approval
+`10R-04.1149`), FCC, IC, COFETEL and CMIIT IDs - the hardware itself appears
+region-independent; **the region lives in the firmware** (SKU lock), so always
+buy an EU donor unit.
+
+## 8. SPI / VIM chip
 
 The Vehicle Interface Module (VIM) — the chip that actually talks CAN — sits
 behind the SoC over **SPI**, not on a kernel CAN controller:
