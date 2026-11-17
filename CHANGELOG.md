@@ -4,10 +4,11 @@ All notable changes to the MZD Toolkit. Versions v4.7.1–v4.8.21 were developed
 
 ## [docs-2026-11-17] - 2026-11-17
 Knowledge update (no toolkit version bump).
+- Fix: ROOT-ACCESS serial section no longer calls serial a dead end - `cmu`/`mzd` gives a root shell on v59 (verified).
 - Recovery: verified serial bootloop rescue (factory `cmu`/`mzd` uid 0 login; `jci_service` in `sm.conf` must be a dlopen'd `.so`, never a script); corrected watchdog/timing claims; new `tools/recovery/cmu_serial_rescue.py` (dry-run default) and `docs/NOR-FLASH-RECOVERY.md`.
 - CAN: new `toolkit/tools/can/` (sniff/watch/capture/log/decode); KCD database not shipped (upstream has no license) - fetch instructions in README. `docs/VIP-FIRMWARE-RE.md`: VIP does CAN TX, but no proven raw-CAN injection path from the CMU; TX only via fixed messages or UDS.
 - Vehicle data: `docs/VEHICLE-DATA-DBUS.md` with corrected scale factors, gear position not on D-Bus; `toolkit/tools/autolog.sh` + `tools/trip-analysis/`.
-- Hardware/firmware: root access per firmware version, `.up` format, v59 vs v74 rootfs diff, v74 update procedure (removes known root routes), connector pinout SVGs, `docs/CMU-SWAP-COMPATIBILITY.md`.
+- Hardware/firmware: root access per firmware version, `.up` format, v59 vs v74 rootfs diff, v74 update procedure (removes known root routes), connector pinout (references silverchris drawing; own SVGs removed as incorrect), `docs/CMU-SWAP-COMPATIBILITY.md`.
 
 ## [4.8.21] - 2026-11-09
 - Current release line; version single-sourced in `lib/common.sh` (`TOOLKIT_VERSION`).
