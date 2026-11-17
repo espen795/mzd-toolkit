@@ -170,19 +170,18 @@ your car's region.
 
 ## 4. Serial console (UART) per version
 
-| Firmware | Login | Shell | Note |
+| Firmware | Login | Result | Note |
 |---|---|---|---|
-| v59 **[verified live]** | `user`/`jci` accepted; `root`/`cmu` -> "Login incorrect" | `/bin/shsshd` in passwd is broken, session closes immediately | IBC bootloader 1.68.17 does not accept a break over serial |
-| v74 **[reported, image analysis]** | `user:...:1000:...:/bin/shsshd` - same broken shell; `cmu:...:0:0:root:/root:/bin/sh` has a valid shell but serial login is refused | same | - |
+| v59 **[verified live, 2026-11-17]** | **`cmu` / `mzd`** (factory default, uid 0, shell `/bin/sh`) | **working root shell** | used to recover a bootlooping unit, see [RECOVERY-BRICK.md](RECOVERY-BRICK.md) |
+| v59 **[verified live]** | `user` / `jci` | login accepted, but the session closes immediately | shell `/bin/shsshd` in passwd does not exist as a binary |
+| v74 **[reported, image analysis]** | `cmu` entry with uid 0 and `/bin/sh` is present in the image | expected to work as on v59, not yet tested live | - |
 
-**Conclusion:** the serial console login is a dead end for shell access in
-both v59 and v74 - `/bin/shsshd` does not exist as a binary. The remaining
-routes are: SSH (port 36000, pubkey), the `jci-autorun` USB hook, or hardware
-(SPI-NOR flashing via CH341A / UART boot-select flip).
-
-The factory-default serial credentials that are identical on every unit
-(`cmu`/`mzd`, `root`/`jci`) may be documented for recovery purposes; on v59/v74
-they do not yield a working shell over serial as described above.
+**Conclusion:** the serial console *is* a working root route on v59 when you
+log in as `cmu` / `mzd`. Earlier reports of "serial is a dead end" came from
+trying the wrong account/password (`root`/`cmu`, `cmu`/`jci`) or the `user`
+account with its broken shell. The `cmu`/`mzd` credentials are factory
+defaults identical on every unit. A 3.3V USB-UART adapter is required
+(115200 8N1); the login prompt appears roughly 7 s after power-on.
 
 ## 5. USB autorun hook (`jci-autorun`)
 
