@@ -147,11 +147,9 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 - [docs/VIP-FIRMWARE-RE.md](docs/VIP-FIRMWARE-RE.md) — can the CMU transmit on CAN? VIP (M16C) reverse engineering + [research/vip-firmware/](research/vip-firmware/)
 - [docs/VEHICLE-DATA-DBUS.md](docs/VEHICLE-DATA-DBUS.md) — vehicle data over D-Bus (corrected scales), `toolkit/tools/autolog.sh`, [tools/trip-analysis/](tools/trip-analysis/)
 - [docs/FIRMWARE.md](docs/FIRMWARE.md) — part numbers, connector pinout, v59 vs v74, v74 update procedure
-- [docs/V74.md](docs/V74.md) — **v74 differences verified on real hardware**: SSH re-entry, neutralizeid7, firewall/ICMP, USB autorun compiled out, terminal event chain, serial `cmu` root login
-- [docs/V74-ACCESS.md](docs/V74-ACCESS.md) — v74 post-update access: own sshd, neutralizeid7, start_network.sh hook, jci-autorun compiled out (disassembly), serial `cmu` root, ICMP firewall, rescue procedure
+- [docs/V74.md](docs/V74.md) — **v74: regaining and keeping root** (verified on real hardware). The working SSH recipe ([`toolkit/net/sshd-up-v74.sh`](toolkit/net/sshd-up-v74.sh), own sshd on 2222), neutralizeid7, firewall/ICMP, USB autorun compiled out, serial `cmu` root, start_network.sh hook
 - [docs/V74-GUI-TERMINAL.md](docs/V74-GUI-TERMINAL.md) — v74 GUI terminal event chain: ReadDTC 22 dropped on stock, diag menu item 10, systemHooks.sh 22, synthetic input via D-Bus/uinput
-- [docs/V74-ROOTFS-DIFF.md](docs/V74-ROOTFS-DIFF.md) — v59 vs v74 rootfs component diff (849→2244 paths, NOR vs eMMC, CarPlay/AndroidAuto, empty stage scripts)
-- [docs/V74-UPDATE-PROCEDURE.md](docs/V74-UPDATE-PROCEDURE.md) — safe v74 update (ASH8 method, MD5, wipe-vs-survive table, post-update re-root)
+- [docs/research/](docs/research/) — v74 background: v59-vs-v74 rootfs diff, safe update procedure (ASH8, wipe-vs-survive)
 - [docs/CMU-SWAP-COMPATIBILITY.md](docs/CMU-SWAP-COMPATIBILITY.md) — which CMU units can be swapped in
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — CMU internals (GUI, D-Bus, partitions, autorun)
 - [docs/TESTING.md](docs/TESTING.md) — what was tested on real hardware
