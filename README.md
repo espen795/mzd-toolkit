@@ -2,7 +2,13 @@
 
 A shell-script toolkit for the **Mazda Connect CMU** (the infotainment head unit) — WiFi connectivity, SSH access, USB tethering, wired LAN via USB dongle, vehicle data over D-Bus, full partition backups, and a GUI terminal shortcut. Runs entirely on the car, delivered on a FAT32 USB stick.
 
-> **Target hardware:** Mazda Connect CMU, firmware **v59.00.502** (also tested against v74 firmware behavior), kernel **3.0.35 ARMv7** (Freescale i.MX6), BusyBox userland, OpenSSH 5.9p1.
+> **Target hardware:** Mazda Connect CMU, firmware **v59.00.502** (primary —
+> this toolkit is built and hardware-tested on v59). v74.00.324A is documented
+> but **different**: after a v74 update your SSH keys, autorun hook and firewall
+> are reset, USB autorun is compiled out, ping is firewalled, and the GUI
+> terminal event chain changed — see **[docs/V74.md](docs/V74.md)** before
+> assuming v59 commands work on v74. Kernel **3.0.35 ARMv7** (Freescale i.MX6),
+> BusyBox userland, OpenSSH 5.9p1 (v59) / stock sshd (v74).
 
 ## What it is
 
@@ -35,13 +41,13 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
 | Full partition backup (`tools/backup.sh`, dd) | ✅ Tested | Long-running; disable the hardware watchdog first; verify sizes after |
 | CAN/VIM vehicle data (`tools/can-monitor.sh`, `tools/vehicle-data.sh`) | ✅ Tested | Passive D-Bus monitor; meaningful data needs ignition on |
 | Release builder (`tools/build-release.sh`) | ✅ Tested | tar.gz primary (CMU has no `unzip`), zip for PC, SHA256SUMS, post-build secrets scan that fails the build |
-| v74 long-term stability | ❌ Not working | Watchdog resets + TX flush loops; roll back to v59 |
+| v74 long-term stability | ❌ Not working | Watchdog resets + TX flush loops; roll back to v59. **v74 also resets your access on every update** (see docs/V74.md): own sshd needed (`/config-mfg/authorized_keys` = Mazda key only), `neutralizeid7` wipes the autorun hook, USB autorun is compiled out, ICMP is firewalled |
 | Other USB dongles (non-ASIX/RTL8152) | ❓ Untested | |
 | iOS USB tethering | ❌ Not working | kernel lacks `iph_eth` |
 
 ## Requirements
 
-- Mazda Connect CMU with firmware **v59.00.502** (v74 partially supported, see above)
+- Mazda Connect CMU with firmware **v59.00.502** (primary target). **v74 works only with the v74-specific paths** — access model, firewall, autorun and terminal event chain all differ: [docs/V74.md](docs/V74.md)
 - **Root access already obtained** — from v59.00.502 onward USB autorun is patched out by Mazda, so it must first be re-enabled (MP3/XSS, diagnostic menu, or serial — see [docs/ROOT-ACCESS.md](docs/ROOT-ACCESS.md))
 - A **FAT32-formatted USB stick** (MBR partition table); the CMU has `tar`+`gzip` but **no `unzip`** — always use the `.tar.gz` release on the car
 - A PC to prepare the stick and to SSH from
@@ -140,7 +146,8 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 - [docs/CANBUS-VIM.md](docs/CANBUS-VIM.md) + [toolkit/tools/can/](toolkit/tools/can/) — CAN bus, VIM/VIP, sniff/log/decode tools
 - [docs/VIP-FIRMWARE-RE.md](docs/VIP-FIRMWARE-RE.md) — can the CMU transmit on CAN? VIP (M16C) reverse engineering + [research/vip-firmware/](research/vip-firmware/)
 - [docs/VEHICLE-DATA-DBUS.md](docs/VEHICLE-DATA-DBUS.md) — vehicle data over D-Bus (corrected scales), `toolkit/tools/autolog.sh`, [tools/trip-analysis/](tools/trip-analysis/)
-- [docs/HARDWARE.md](docs/HARDWARE.md) / [docs/FIRMWARE.md](docs/FIRMWARE.md) — part numbers, connector pinout, v59 vs v74, v74 update procedure
+- [docs/FIRMWARE.md](docs/FIRMWARE.md) — part numbers, connector pinout, v59 vs v74, v74 update procedure
+- [docs/V74.md](docs/V74.md) — **v74 differences verified on real hardware**: SSH re-entry, neutralizeid7, firewall/ICMP, USB autorun compiled out, terminal event chain, serial `cmu` root login
 - [docs/CMU-SWAP-COMPATIBILITY.md](docs/CMU-SWAP-COMPATIBILITY.md) — which CMU units can be swapped in
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — CMU internals (GUI, D-Bus, partitions, autorun)
 - [docs/TESTING.md](docs/TESTING.md) — what was tested on real hardware

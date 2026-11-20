@@ -56,8 +56,11 @@ different WiFi chip firmware and different autorun/USB policy:
 |---|---|---|---|
 | wl12xx station firmware (`wl128x-fw-4-sr.bin`) | **Rev 7.3.10.10.136** | **FRev 7.3.10.0.142** | v74 is newer — but on our hardware it produced **more** watchdog crashes, not fewer |
 | wl12xx multi-role firmware (`wl128x-fw-4-mr.bin`) | Rev 7.3.10.10.136 | Rev 7.5.7.0.50 | v74 much newer |
-| USB autorun | patched out | blocked; serial access is the only way in | v74 removes the USB tweak path entirely |
-| SSH | stock sshd on port 36000 | same | see SSH-V59.md |
+| USB autorun | patched out | **compiled out** — `UPDATEA_SYS_SRV_enableUsbDbgScript` is const `0` in `svcjciupdatea.so` (disassembly-proven); sticks mount but never execute. Serial `cmu` login (uid 0) is the working root route | see V74.md |
+| SSH | stock sshd on port 36000, keys in `/data_persist` | stock sshd reads `AuthorizedKeysFile /config-mfg/authorized_keys` (Mazda key only); own sshd needed (`ssh/sshd_config_v74`). `neutralizeid7` deletes the autorun hook on every update | see V74.md |
+| Firewall | permissive | `jci-fw.sh`: `-P INPUT DROP` + ICMP echo-request dropped; TCP 36000 accepted (not on wlan0) | ping fails, SSH works — see V74.md |
+| GUI terminal | `ReadDTC testId=22` works via `systemHooks.sh 22` | stock v74 drops testId=22 (`startSystemScripts.sh` knows only code 11); terminal = diag menu item 10 (page 2) | patch startSystemScripts.sh to delegate — see V74.md |
+| stage scripts | content + hook points | shebang-only (empty) except `start_network.sh` (root, loads usbnet/asix, eth1, sshd) | hook still works via `sm` |
 
 **WiFi stability:** the wl12xx watchdog panic root cause (WIFI.md) is *worse*
 on v74 in practice — the TX-flush/hardware-watchdog recovery loop was observed
