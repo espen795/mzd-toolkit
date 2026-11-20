@@ -136,7 +136,7 @@ Host mzd-cmu
 
 ## 6. Configuration
 
-Configuration lives in `mzd-data/config/` on the USB stick root (fallback: `toolkit/config/`):
+Configuration lives in `mzd-data/config/` on the USB stick root (fallback: `toolkit-v59/config/`):
 
 - **`settings.conf`** — copy from `config/settings.conf.example`:
   ```sh

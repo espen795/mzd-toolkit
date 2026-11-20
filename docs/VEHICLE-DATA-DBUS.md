@@ -98,7 +98,7 @@ Gear position (manual), turn signals / headlight switch (CAN `0x09A`
 
 - Script on the CMU: `/data_persist/dev/bin/mzd-dbus-autolog.sh`, started at
   the end of `/data_persist/dev/bin/autorun` (`sh ... &`). A cleaned-up,
-  installable copy ships in this repo as `toolkit/tools/autolog.sh`.
+  installable copy ships in this repo as `toolkit-v59/tools/autolog.sh`.
 - v2 writes, per CMU boot / start:
   - `<usb>/dbus-logs/dbus-b<bootid>-u<uptime>.raw` - full `dbus-monitor`
     output (headers + values)

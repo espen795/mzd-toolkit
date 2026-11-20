@@ -79,4 +79,4 @@ Load order matters: `cdc_ether` **before** `rndis_host`. Upload .ko files to the
 
 ## Release packaging
 
-`tools/build-release.sh` stages `toolkit/`, excludes runtime/secrets, and emits `mzd-toolkit-vX.Y.Z.tar.gz` (primary, for the CMU), `.zip` (PC only, built via `zip` or python3 `zipfile`), and `SHA256SUMS`; a post-build verify fails the build if any secrets/runtime paths appear in the assets.
+`tools/build-release.sh` stages `toolkit-v59/`, excludes runtime/secrets, and emits `mzd-toolkit-vX.Y.Z.tar.gz` (primary, for the CMU), `.zip` (PC only, built via `zip` or python3 `zipfile`), and `SHA256SUMS`; a post-build verify fails the build if any secrets/runtime paths appear in the assets.

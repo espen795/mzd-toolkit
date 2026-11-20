@@ -32,7 +32,7 @@ Spawn a subagent per file (or small batch) with a strict prompt:
 > (5) do NOT touch files outside the given list; (6) report any uncertain
 > translation, do not guess.
 
-Verify per file: `sh toolkit/tools/selfcheck.sh <file>` must print PASS,
+Verify per file: `sh toolkit-v59/tools/selfcheck.sh <file>` must print PASS,
 line count must match, `dash -n`/`busybox ash -n` for any embedded scripts.
 
 ### Step 2 — Deduplicate against existing public docs
@@ -51,8 +51,8 @@ rootfs diff table, the full `/config-mfg` file map) into it.
 
 ```sh
 cd /path/to/mazda-mzd-toolkit-public
-sh toolkit/tools/scan-secrets.sh --self-test   # scanner still works?
-sh toolkit/tools/scan-secrets.sh .              # must print CLEAN
+sh toolkit-v59/tools/scan-secrets.sh --self-test   # scanner still works?
+sh toolkit-v59/tools/scan-secrets.sh .              # must print CLEAN
 # Dutch residue check (all files):
 python3 -I /tmp/mzd-verify/nl_check.py $(git ls-files '*.md' '*.sh' '*.txt' '*.example')
 ```
@@ -70,7 +70,7 @@ git push origin main          # deploy key ~/.ssh/id_github_mzd_deploy
 ```sh
 # edit CHANGELOG.md + version in build-release.sh if needed
 git tag vX.Y.Z && git push origin vX.Y.Z
-sh toolkit/tools/build-release.sh X.Y.Z /tmp/mzd-rel   # secret-scan gate built in
+sh toolkit-v59/tools/build-release.sh X.Y.Z /tmp/mzd-rel   # secret-scan gate built in
 # upload the 3 assets via GitHub Releases web UI (deploy key can't create releases)
 # also: cp assets to <file-sharing>/uploads/ for your files host
 ```

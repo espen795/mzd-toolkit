@@ -161,7 +161,7 @@ Note: after a while of inactivity the screen goes black (`jci_cpu_gauge -e` powe
 ## Release builder
 
 ```sh
-sh toolkit/tools/build-release.sh 4.8.21 /tmp/mzd-release
+sh toolkit-v59/tools/build-release.sh 4.8.21 /tmp/mzd-release
 ```
 
 Produces in the output dir:

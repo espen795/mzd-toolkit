@@ -16,13 +16,13 @@ Without this file only the built-in generic checks run (private keys, API tokens
 1. **Prove that the scanner works**
 
    ```sh
-   sh toolkit/tools/scan-secrets.sh --self-test      # must end with: SELF-TEST PASSED
+   sh toolkit-v59/tools/scan-secrets.sh --self-test      # must end with: SELF-TEST PASSED
    ```
 
 2. **Scan the working tree** (scripts, docs, drivers)
 
    ```sh
-   sh toolkit/tools/scan-secrets.sh .                # must end with: scan-secrets: CLEAN
+   sh toolkit-v59/tools/scan-secrets.sh .                # must end with: scan-secrets: CLEAN
    ```
 
    Documentation placeholders are fine: `192.168.0.x`, `192.168.1.x`, `<CMU_IP>`, `YOUR_SSID`,
@@ -31,7 +31,7 @@ Without this file only the built-in generic checks run (private keys, API tokens
 3. **Scan the git history** - a leak that was fixed in the latest commit still lives in old commits
 
    ```sh
-   sh toolkit/tools/scan-secrets.sh --history        # must report: N commit(s) CLEAN
+   sh toolkit-v59/tools/scan-secrets.sh --history        # must report: N commit(s) CLEAN
    ```
 
    If it reports findings and the repository has never been pushed, squash the history into a single
@@ -52,7 +52,7 @@ Without this file only the built-in generic checks run (private keys, API tokens
 6. **Build the release**
 
    ```sh
-   sh toolkit/tools/build-release.sh X.Y.Z /tmp/mzd-release
+   sh toolkit-v59/tools/build-release.sh X.Y.Z /tmp/mzd-release
    ```
 
    The build fails if secret/runtime files, or anything the scanner flags, end up inside an archive.

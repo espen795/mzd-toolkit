@@ -10,6 +10,18 @@ A shell-script toolkit for the **Mazda Connect CMU** (the infotainment head unit
 > assuming v59 commands work on v74. Kernel **3.0.35 ARMv7** (Freescale i.MX6),
 > BusyBox userland, OpenSSH 5.9p1 (v59) / stock sshd (v74).
 
+## Two firmware tracks
+
+| Folder | Firmware | Status |
+|---|---|---|
+| [`toolkit-v59/`](toolkit-v59/) | v59.00.502 | **Hardware-tested** — the primary, proven toolkit |
+| [`toolkit-v74/`](toolkit-v74/) | v74.00.324A | **Untested** except the SSH bring-up (`net/sshd-up-v74.sh`, proven on v74). v59 base + v74 deltas (`lib/ensure-rw.sh`, `ssh/sshd_config_v74`, `net/sshd-up-v74.sh`) |
+
+The two folders are ~identical; v74 only differs where it has to. If you are on
+v74, read **[docs/V74.md](docs/V74.md)** first — access, firewall, autorun and the
+terminal event chain all changed. Use `toolkit-v59/` on v59 and for anything you
+want verified.
+
 ## What it is
 
 The CMU is a Linux box. Once you have root on it (via any known exploit — serial, ID7, or the autorun method), this toolkit gives you:
@@ -143,11 +155,11 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — known failure modes and fixes
 - [docs/RECOVERY-BRICK.md](docs/RECOVERY-BRICK.md) — bootloop rescue: verified serial recovery (factory `cmu`/`mzd` login, sm.conf `.so` fix), dead ends, prevention checklist; tool in [tools/recovery/](tools/recovery/)
 - [docs/NOR-FLASH-RECOVERY.md](docs/NOR-FLASH-RECOVERY.md) — CH341A SPI-NOR dump/restore runbook (last resort)
-- [docs/CANBUS-VIM.md](docs/CANBUS-VIM.md) + [toolkit/tools/can/](toolkit/tools/can/) — CAN bus, VIM/VIP, sniff/log/decode tools
+- [docs/CANBUS-VIM.md](docs/CANBUS-VIM.md) + [toolkit-v59/tools/can/](toolkit-v59/tools/can/) — CAN bus, VIM/VIP, sniff/log/decode tools
 - [docs/VIP-FIRMWARE-RE.md](docs/VIP-FIRMWARE-RE.md) — can the CMU transmit on CAN? VIP (M16C) reverse engineering + [research/vip-firmware/](research/vip-firmware/)
-- [docs/VEHICLE-DATA-DBUS.md](docs/VEHICLE-DATA-DBUS.md) — vehicle data over D-Bus (corrected scales), `toolkit/tools/autolog.sh`, [tools/trip-analysis/](tools/trip-analysis/)
+- [docs/VEHICLE-DATA-DBUS.md](docs/VEHICLE-DATA-DBUS.md) — vehicle data over D-Bus (corrected scales), `toolkit-v59/tools/autolog.sh`, [tools/trip-analysis/](tools/trip-analysis/)
 - [docs/FIRMWARE.md](docs/FIRMWARE.md) — part numbers, connector pinout, v59 vs v74, v74 update procedure
-- [docs/V74.md](docs/V74.md) — **v74: regaining and keeping root** (verified on real hardware). The working SSH recipe ([`toolkit/net/sshd-up-v74.sh`](toolkit/net/sshd-up-v74.sh), own sshd on 2222), neutralizeid7, firewall/ICMP, USB autorun compiled out, serial `cmu` root, start_network.sh hook
+- [docs/V74.md](docs/V74.md) — **v74: regaining and keeping root** (verified on real hardware). The working SSH recipe ([`toolkit-v59/net/sshd-up-v74.sh`](toolkit-v59/net/sshd-up-v74.sh), own sshd on 2222), neutralizeid7, firewall/ICMP, USB autorun compiled out, serial `cmu` root, start_network.sh hook
 - [docs/V74-GUI-TERMINAL.md](docs/V74-GUI-TERMINAL.md) — v74 GUI terminal event chain: ReadDTC 22 dropped on stock, diag menu item 10, systemHooks.sh 22, synthetic input via D-Bus/uinput
 - [docs/research/](docs/research/) — v74 background: v59-vs-v74 rootfs diff, safe update procedure (ASH8, wipe-vs-survive)
 - [docs/CMU-SWAP-COMPATIBILITY.md](docs/CMU-SWAP-COMPATIBILITY.md) — which CMU units can be swapped in

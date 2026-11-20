@@ -141,4 +141,4 @@ ls /sys/class/net/
 dmesg | tail -20
 ```
 
-**NOTE:** If usbnet is already loaded with a different build, cdc_ether cannot bind to our usbnet symbols. In that case: use the **v74 cdc_ether.ko** (from toolkit/wifi/cdc-modules/) together with our **rndis_host-v2.ko**, OR load our usbnet-v2 first (if the loaded usbnet can be removed: `rmmod usbnet` if asix is not in use).
+**NOTE:** If usbnet is already loaded with a different build, cdc_ether cannot bind to our usbnet symbols. In that case: use the **v74 cdc_ether.ko** (from toolkit-v59/wifi/cdc-modules/) together with our **rndis_host-v2.ko**, OR load our usbnet-v2 first (if the loaded usbnet can be removed: `rmmod usbnet` if asix is not in use).

@@ -66,7 +66,7 @@ CMU, which made the stock sshd silently ignore `authorized_keys`
 /config-mfg/authorized_keys               # read-only factory partition, stock sshd
 ```
 
-`toolkit/ssh/deploy-key.sh` copies a public key from USB into
+`toolkit-v59/ssh/deploy-key.sh` copies a public key from USB into
 `/data_persist/dev/bin/authorized_keys`; the autorun copies it into the runtime
 location too.
 
@@ -116,5 +116,5 @@ deprecated even here; ecdsa/ed25519 do **not**.
   -j ACCEPT` — never `-P INPUT ACCEPT`).
 - A black screen does **not** mean SSH died — the CMU stays powered (and USB
   powered) while the display times out; SSH sessions persist.
-- Helper scripts: `toolkit/ssh/ssh-pwd.sh` (password sshd), `install-ssh.sh`,
+- Helper scripts: `toolkit-v59/ssh/ssh-pwd.sh` (password sshd), `install-ssh.sh`,
   `quick-fix-working.sh`.
