@@ -7,7 +7,7 @@ What was — and was not — verified on real hardware. "Tested" below means: ex
 | Area | What was verified | Evidence |
 |---|---|---|
 | WiFi via NMS | `connect-nms.sh` exit 0 with IP on the car's hotspot; scan → add network → select → connect → DHCP via NMS; udhcpc fallback; default-route repair after IP | run logs `connect-nms` (exit 0, IP assigned; later runs exit 4 with watchdog evidence) |
-| wl12xx root cause | Deterministic FW watchdog crash `pc: 0x21b8e` preceded by "Unable to flush all TX buffers"; `deauth reason=3/7`; analysis in `toolkit/wifi/WIFI-ROOTCAUSE-ANALYSIS.md` from a full log dump | `dmesg` timeline in the dump, 20× TX-flush + 2× watchdog |
+| wl12xx root cause | Deterministic FW watchdog crash `pc: 0x21b8e` preceded by "Unable to flush all TX buffers"; `deauth reason=3/7`; analysis in `toolkit-v59/wifi/WIFI-ROOTCAUSE-ANALYSIS.md` from a full log dump | `dmesg` timeline in the dump, 20× TX-flush + 2× watchdog |
 | Power-save fix | `fix-powersave*.sh` sets `/sys/module/wl12xx/parameters/ps=off` (not `on` — that was a real bug), `/sys/.../power/control=on`, rfkill unblock | run logs + dmesg before/after |
 | Watchdog recovery | `tools/watchdog.sh once/bg/stop/status`; NMS `WIFI_Recovery` fallback; detects `watchdog interrupt` / `pc: 0x…` / TX-flush signatures | watchdog loop log |
 | SSH pubkey | RSA-2048 keypair (`ssh/id_mzd`), pubkey in `/data_persist/dev/bin/authorized_keys` + `/tmp/mzd-sshd/authorized_keys` (600), sshd on 36000, connect from Linux with `-o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o PubkeyAcceptedAlgorithms=+ssh-rsa` | successful `ssh -p 36000 cmu@<CMU_IP> -i id_mzd` sessions |
@@ -36,7 +36,7 @@ What was — and was not — verified on real hardware. "Tested" below means: ex
 ## How to re-run the off-car tests
 
 ```sh
-sh toolkit/tools/build-release.sh "" /tmp/mzd-release-test   # packaging + secret-scan verify
+sh toolkit-v59/tools/build-release.sh "" /tmp/mzd-release-test   # packaging + secret-scan verify
 sh -n $(find toolkit -name '*.sh')                           # syntax
 busybox sh -n $(find toolkit -name '*.sh') 2>/dev/null || true
 ```

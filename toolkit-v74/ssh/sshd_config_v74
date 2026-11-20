@@ -1,0 +1,21 @@
+# MZD Toolkit - sshd_config for v74
+# The stock v74 sshd_config uses AuthorizedKeysFile /config-mfg/authorized_keys
+# (Mazda's key only). This config runs YOUR own sshd on port 2222 with keys
+# from /data_persist (port 2222 avoids a respawn conflict with the stock sshd
+# on 36000). Start it manually with:
+#   /usr/sbin/sshd -f /data_persist/mzd-toolkit/ssh/sshd_config_v74
+# or just use net/sshd-up-v74.sh, which sets up routing+firewall+sshd in one go.
+Port 2222
+ListenAddress 0.0.0.0
+PermitRootLogin yes
+PasswordAuthentication no
+PubkeyAuthentication yes
+AuthorizedKeysFile /tmp/mzd-sshd/authorized_keys /data_persist/dev/authorized_keys /data_persist/dev/bin/authorized_keys
+PermitEmptyPasswords no
+UsePrivilegeSeparation no
+StrictModes no
+PidFile /tmp/mzd-sshd/sshd.pid
+LogLevel INFO
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_dsa_key
+Subsystem sftp /usr/lib/openssh/sftp-server

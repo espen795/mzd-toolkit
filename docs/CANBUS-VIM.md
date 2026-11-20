@@ -226,7 +226,7 @@ bus can push the VIP into bus-off. See VIP-FIRMWARE-RE.md section 6.
 
 ## 7. Toolkit scripts
 
-All in `toolkit/tools/`, all using the service-bus address:
+All in `toolkit-v59/tools/`, all using the service-bus address:
 
 | Script | What it does |
 |---|---|
@@ -237,10 +237,10 @@ All in `toolkit/tools/`, all using the service-bus address:
 | `can-bus.sh` / `vim-deep-dive.sh` | deeper VIM/VBS exploration |
 
 For raw CAN capture/decode on setups that expose a `can*` interface, see
-`toolkit/tools/can/` (`can-watch.sh`, `can-capture.sh`, `can-sniff.sh`,
+`toolkit-v59/tools/can/` (`can-watch.sh`, `can-capture.sh`, `can-sniff.sh`,
 `can-log.sh`, `kcd_decode.py`, `can-summary.py`); the CAN database itself is
 fetched from upstream because it has no redistribution license (see
-`toolkit/tools/can/README.md`).
+`toolkit-v59/tools/can/README.md`).
 
 Quick manual checks on the car:
 

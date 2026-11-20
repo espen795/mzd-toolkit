@@ -152,7 +152,7 @@ ZIP contents (driven by `main_instructions.ini`):
 | `bootstrap/`, `ibc1/`, `ibc2/`, `fail-safe/` | optional | SPI-NOR updates |
 | `vip/`, `gps/` | optional | VIP coprocessor / GPS firmware |
 | `passwdupdate/` | optional | scripts to update `/etc/passwd` and `authorized_keys` |
-| `cleandatapersist/` | optional | **wipes `/mnt/data_persist/`** - autorun/toolkit/keys are lost on reinstall |
+| `cleandatapersist/` | optional | **wipes `/mnt/data_persist/`** - autorun/toolkit-v59/keys are lost on reinstall |
 | `usersettingsbackup/` / `usersettingscleanup/` / `usersettingsrestore/` | optional | user settings backup/restore during update |
 | `resources/`, `preloaddata/`, `compactwnn/`, `getnewflavour/`, `checksumoption/` | optional | misc |
 

@@ -9,14 +9,14 @@ The strings live in these files:
 
 | File | What it contains |
 |------|------------------|
-| `toolkit/menu.sh` | Master menu + all submenus (WiFi, SSH, Network, Diagnostics, System, Tools, VIM/CAN) |
-| `toolkit/menu.lib/common.sh` | UI helpers: header, pause prompt, status lines, `read_choice`, `invalid_choice` |
-| `toolkit/install.sh` | Installer output (step messages, shortcuts, result) |
-| `toolkit/FIX-ALL.sh` | All-in-one fix script output |
-| `toolkit/QUICK-FIX.sh` | Quick-fix script output |
-| `toolkit/status.sh` | Running-process status output |
-| `toolkit/stop-all.sh` | Stop-all output |
-| `toolkit/README.txt` | On-stick readme |
+| `toolkit-v59/menu.sh` | Master menu + all submenus (WiFi, SSH, Network, Diagnostics, System, Tools, VIM/CAN) |
+| `toolkit-v59/menu.lib/common.sh` | UI helpers: header, pause prompt, status lines, `read_choice`, `invalid_choice` |
+| `toolkit-v59/install.sh` | Installer output (step messages, shortcuts, result) |
+| `toolkit-v59/FIX-ALL.sh` | All-in-one fix script output |
+| `toolkit-v59/QUICK-FIX.sh` | Quick-fix script output |
+| `toolkit-v59/status.sh` | Running-process status output |
+| `toolkit-v59/stop-all.sh` | Stop-all output |
+| `toolkit-v59/README.txt` | On-stick readme |
 
 ## How to localize
 
@@ -37,13 +37,13 @@ The strings live in these files:
    `case` patterns in `menu.sh`.
 6. After editing, verify syntax with:
    ```sh
-   sh -n toolkit/menu.sh
-   sh -n toolkit/menu.lib/common.sh
-   sh -n toolkit/install.sh
-   sh -n toolkit/FIX-ALL.sh
-   sh -n toolkit/QUICK-FIX.sh
-   sh -n toolkit/status.sh
-   sh -n toolkit/stop-all.sh
+   sh -n toolkit-v59/menu.sh
+   sh -n toolkit-v59/menu.lib/common.sh
+   sh -n toolkit-v59/install.sh
+   sh -n toolkit-v59/FIX-ALL.sh
+   sh -n toolkit-v59/QUICK-FIX.sh
+   sh -n toolkit-v59/status.sh
+   sh -n toolkit-v59/stop-all.sh
    ```
 
 ## Notes

@@ -8,7 +8,7 @@ adapter).
 
 ## Capturing on the CMU
 
-Install `toolkit/tools/autolog.sh` on the CMU (e.g. as
+Install `toolkit-v59/tools/autolog.sh` on the CMU (e.g. as
 `/data_persist/dev/bin/mzd-dbus-autolog.sh`, started from
 `/data_persist/dev/bin/autorun`). It writes one pair of files per boot to a
 USB stick:

@@ -12,7 +12,7 @@ A clear description of what happened vs. what you expected.
 **Environment (please fill in — required)**
 - CMU firmware version (from `/jci/version.ini`): e.g. `59.00.502`
 - Kernel (`uname -a` over SSH): e.g. `Linux 3.0.35 ... ARMv7`
-- Toolkit version (banner in `menu.sh`, or `grep TOOLKIT_VERSION toolkit/lib/common.sh`): e.g. `4.8.21`
+- Toolkit version (banner in `menu.sh`, or `grep TOOLKIT_VERSION toolkit-v59/lib/common.sh`): e.g. `4.8.21`
 - Connection method: `wlan0` / `usb0` (tether) / `eth1` (dongle)
 - USB dongle model (if relevant, `lsusb` VID:PID): e.g. `0b95:772a` ASIX AX88772
 - Phone model + tethering mode (if relevant): e.g. Samsung, RNDIS `04e8:6863` vs AOA `04e8:6860`

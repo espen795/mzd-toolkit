@@ -95,7 +95,7 @@ while keeping your board's NVS.
 
 ## 4. Fixes (in priority order)
 
-All scripts are in `toolkit/wifi/` and written for BusyBox sh using only
+All scripts are in `toolkit-v59/wifi/` and written for BusyBox sh using only
 `wpa_cli`, `ifconfig`, `/sys`, `/proc`, `dmesg` (no `iw`).
 
 ### P1 — disable power save (immediate effect, no reboot)

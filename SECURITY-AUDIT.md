@@ -1,7 +1,7 @@
 # SECURITY-AUDIT.md — Mazda MZD Toolkit (public export)
 
 **Audit date:** 2026-11-10
-**Scope:** every file under the repo root (`drivers/`, `toolkit/`, `docs/`, root files), excluding `.git/`
+**Scope:** every file under the repo root (`drivers/`, `toolkit-v59/`, `docs/`, root files), excluding `.git/`
 **Auditor:** automated sanitize pass (OpenClaw subagent), model mistral/mistral-large-4
 **Goal:** guarantee that **nothing personal or secret** leaks into the public GitHub repo, and that the scripts themselves are safe to publish.
 
@@ -33,16 +33,16 @@ Git history was also scanned: `git grep <patterns> $(git rev-list --all)`.
 | # | File | Hit | Fix applied |
 |---|---|---|---|
 | 1 | `drivers/BUILD_REPORT_RNDIS_2026-11-10.md` | Internal IP + cleartext password in a git-history blob (see §4) | Replaced in the working tree with a `<CMU_IP>` placeholder; history handled in §4 |
-| 2 | `toolkit/wifi/WIFI-ROOTCAUSE-ANALYSIS.md` | Personal BSSID in git history | Replaced in the working tree with generic `aa:bb:cc:dd:ee:ff`; history handled in §4 |
-| 3 | `toolkit/net/autostart-eth1-ssh.sh` | Real dongle MAC in a comment (git history) | Redacted in the working tree; history handled in §4 |
+| 2 | `toolkit-v59/wifi/WIFI-ROOTCAUSE-ANALYSIS.md` | Personal BSSID in git history | Replaced in the working tree with generic `aa:bb:cc:dd:ee:ff`; history handled in §4 |
+| 3 | `toolkit-v59/net/autostart-eth1-ssh.sh` | Real dongle MAC in a comment (git history) | Redacted in the working tree; history handled in §4 |
 | 4 | `docs/PUBLISH-TO-GITHUB.md` | Developer home path (git history) | Replaced with `/path/to/...` in the working tree; history handled in §4 |
-| 5 | 15 files (`toolkit/ssh/*`, `toolkit/wifi/connect-nms.sh`, `toolkit/lib/common.sh`, `toolkit/QUICK-FIX.sh`, `toolkit/FIX-ALL.sh`, `toolkit/README.txt`, `toolkit/tools/*`, `toolkit/config/settings.conf.example`, `toolkit/ssh/sshd_config`) | 20× "the developer 2026-11-XX …" attribution comments leaking dev identity/timestamps | Neutralized to `(design decision)` / `hardware testing` / removed |
-| 6 | `toolkit/tools/build-release.sh` | Post-build verify scanned only **filenames**, not **contents** — a leaked email/IP inside a normal file would ship | Added step `[5b/5]` content secret-scan over extracted tar.gz + zip contents; **build now FAILS on personal-data pattern hit**. Self-excludes the detector's own pattern list. Verified positive (clean tree passes) and negative (planted `orion@fles9495.nl` → BUILD GEFAALD). |
+| 5 | 15 files (`toolkit-v59/ssh/*`, `toolkit-v59/wifi/connect-nms.sh`, `toolkit-v59/lib/common.sh`, `toolkit-v59/QUICK-FIX.sh`, `toolkit-v59/FIX-ALL.sh`, `toolkit-v59/README.txt`, `toolkit-v59/tools/*`, `toolkit-v59/config/settings.conf.example`, `toolkit-v59/ssh/sshd_config`) | 20× "the developer 2026-11-XX …" attribution comments leaking dev identity/timestamps | Neutralized to `(design decision)` / `hardware testing` / removed |
+| 6 | `toolkit-v59/tools/build-release.sh` | Post-build verify scanned only **filenames**, not **contents** — a leaked email/IP inside a normal file would ship | Added step `[5b/5]` content secret-scan over extracted tar.gz + zip contents; **build now FAILS on personal-data pattern hit**. Self-excludes the detector's own pattern list. Verified positive (clean tree passes) and negative (planted `orion@fles9495.nl` → BUILD GEFAALD). |
 
 **NOT fixed (checked, clean):**
 - `drivers/r8152-armv7-3.0.35.ko` was earlier a **Cloudflare Access HTML login page** saved as `.ko` (contained `fles9495.cloudflareaccess.com` + a JWT). In the current tree this file no longer exists; all 12 remaining `.ko` files are validated ELF (`file` check) and their `strings` output contains **zero** personal-data hits. The only `/home/...` strings inside modules are `/home/cmu/...` — that is the **CMU's own build path** baked in by the vendor kernel build, not the developer's machine.
-- `toolkit/wifi/v74-firmware/wl128x-fw-4-sr.bin` and `rt2800-firmware/rt2870.bin` (TI/Ralink vendor blobs): `strings` scan = 0 hits.
-- `toolkit/config/secrets.conf.example` and `settings.conf.example`: already placeholders (`YOUR_HOTSPOT_SSID`, `OPEN`, empty `MZD_SSH_PASSWORD=""`) — no real values.
+- `toolkit-v59/wifi/v74-firmware/wl128x-fw-4-sr.bin` and `rt2800-firmware/rt2870.bin` (TI/Ralink vendor blobs): `strings` scan = 0 hits.
+- `toolkit-v59/config/secrets.conf.example` and `settings.conf.example`: already placeholders (`YOUR_HOTSPOT_SSID`, `OPEN`, empty `MZD_SSH_PASSWORD=""`) — no real values.
 - No private keys, tokens, VINs, or hardcoded WiFi PSKs anywhere. `PWD_DEFAULT="mzd"` in `autostart-eth1-ssh.sh` is the well-known default CMU credential, not a personal secret — kept (it is the documented stock password).
 - Git history: `tools/scan-secrets.sh --history` flagged 4 commits. All findings are (a) the
   pre-fix blobs listed in the table above and (b) this scanner's own documentation files
@@ -67,14 +67,14 @@ git add -A
 git commit -m "Mazda MZD Toolkit v4.8.21 - initial public release"
 git branch -M main          # replaces the old main
 git branch -D <old-branches> 2>/dev/null
-# verify: sh toolkit/tools/scan-secrets.sh --history   -> must report all commits CLEAN
+# verify: sh toolkit-v59/tools/scan-secrets.sh --history   -> must report all commits CLEAN
 ```
 
 If the repo had already been pushed: treat the leaked values as compromised, rotate them, and
 rewrite history with `git filter-repo` (or BFG) before making the repo public.
 
-- **Repo root `.gitignore`** (rewritten this audit) covers: `mzd-data/`, `logs/`, `backups/`, `*.log`, `run.env`, `*.seq`, `STOP`, `config/settings.conf`, `config/secrets.conf` (+ `toolkit/...` variants), `ssh/id_mzd`, `ssh/id_mzd.pub` (+ `toolkit/...` variants), `*.img`, `*.raw`, `*.dd`, `core`, `core.*`, editor cruft.
-- **`toolkit/.gitignore`** already covers the same secrets + runtime dirs — verified present.
+- **Repo root `.gitignore`** (rewritten this audit) covers: `mzd-data/`, `logs/`, `backups/`, `*.log`, `run.env`, `*.seq`, `STOP`, `config/settings.conf`, `config/secrets.conf` (+ `toolkit-v59/...` variants), `ssh/id_mzd`, `ssh/id_mzd.pub` (+ `toolkit-v59/...` variants), `*.img`, `*.raw`, `*.dd`, `core`, `core.*`, editor cruft.
+- **`toolkit-v59/.gitignore`** already covers the same secrets + runtime dirs — verified present.
 
 ## 4. build-release.sh hardening
 
@@ -84,7 +84,7 @@ rewrite history with `git filter-repo` (or BFG) before making the repo public.
 
 ## 5. Script safety
 
-- `sh -n` (POSIX syntax check) run over **all 117 shell scripts** (`*.sh`, `autorun`, `install.sh`) under `toolkit/` and `drivers/` → **0 failures**.
+- `sh -n` (POSIX syntax check) run over **all 117 shell scripts** (`*.sh`, `autorun`, `install.sh`) under `toolkit-v59/` and `drivers/` → **0 failures**.
 - `bash -n` additionally on the 7 most critical scripts (menu, install, FIX-ALL, QUICK-FIX, ssh/start, wifi/connect-nms, build-release) → all OK.
 
 ## 6. Remaining risks
@@ -100,7 +100,7 @@ rewrite history with `git filter-repo` (or BFG) before making the repo public.
 cd <repo-root>
 
 # 1. Build release (fails automatically on filename OR content secret hits)
-sh toolkit/tools/build-release.sh X.Y.Z /tmp/mzd-release
+sh toolkit-v59/tools/build-release.sh X.Y.Z /tmp/mzd-release
 
 # 2. Repo-wide secret sweep (must return zero hits; placeholders like
 #    <CMU_IP>, 192.168.0.2, YOUR_SSID, aa:bb:cc:dd:ee:ff are fine)
@@ -120,7 +120,7 @@ git grep -iE 'fles9495|192\.168\.2\.[0-9]|10\.116\.|ELI_Phone|PRIVATE KEY|pwd mz
 
 # 6. Confirm gitignore covers secrets
 for e in config/secrets.conf config/settings.conf ssh/id_mzd ssh/id_mzd.pub logs/ mzd-data/ '*.log' backups/ '*.img' core; do
-  git check-ignore -q "toolkit/$e" 2>/dev/null || git check-ignore -q "$e" || echo "NOT IGNORED: $e"
+  git check-ignore -q "toolkit-v59/$e" 2>/dev/null || git check-ignore -q "$e" || echo "NOT IGNORED: $e"
 done
 
 # 7. Tag + push + create GitHub Release with tar.gz (primary) + zip + SHA256SUMS

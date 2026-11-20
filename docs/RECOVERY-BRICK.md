@@ -267,7 +267,7 @@ route 1.)
 ## Prevention checklist (before any mod)
 
 - [ ] Full `dd` backup of `ffx01p1` (rootfs), `mmcblk0p2` (persist),
-      `ffx01p4` (data) to USB -- `toolkit/tools/backup.sh` (disable the
+      `ffx01p4` (data) to USB -- `toolkit-v59/tools/backup.sh` (disable the
       hardware watchdog during dd:
       `echo 1 > '/sys/class/gpio/Watchdog Disable/value'`)
 - [ ] `cp /jci/sm/sm.conf sm.conf.bak` before touching it

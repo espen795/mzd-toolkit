@@ -38,7 +38,7 @@ If a token ever leaks: revoke it immediately at https://github.com/settings/toke
 
 ```bash
 # Build the USB image (fails automatically if secrets leak into the archive)
-sh toolkit/tools/build-release.sh 4.8.21 /tmp/mzd-release
+sh toolkit-v59/tools/build-release.sh 4.8.21 /tmp/mzd-release
 # -> mzd-toolkit-v4.8.21.tar.gz (PRIMARY for the car) + .zip (PC only) + SHA256SUMS
 
 git tag v4.8.21

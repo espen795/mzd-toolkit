@@ -30,7 +30,7 @@ All scripts run on the CMU's **BusyBox sh** (kernel 3.0.35). That means:
 
 ## Hardware testing (required for CMU-facing changes)
 
-Changes to anything under `toolkit/` that runs on the CMU should be verified on a real unit before merge:
+Changes to anything under `toolkit-v59/` that runs on the CMU should be verified on a real unit before merge:
 
 1. Build a release and put it on a FAT32 stick (`sha256sum -c SHA256SUMS` after copying).
 2. Run the feature from the menu or directly; the run is logged automatically to `mzd-data/logs/runs/vX.Y.Z-<script>-b<boot8>-r<seq>/` (stdout/stderr/exit.code).
