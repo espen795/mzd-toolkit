@@ -57,7 +57,7 @@ different WiFi chip firmware and different autorun/USB policy:
 | wl12xx station firmware (`wl128x-fw-4-sr.bin`) | **Rev 7.3.10.10.136** | **FRev 7.3.10.0.142** | v74 is newer — but on our hardware it produced **more** watchdog crashes, not fewer |
 | wl12xx multi-role firmware (`wl128x-fw-4-mr.bin`) | Rev 7.3.10.10.136 | Rev 7.5.7.0.50 | v74 much newer |
 | USB autorun | patched out | **compiled out** — `UPDATEA_SYS_SRV_enableUsbDbgScript` is const `0` in `svcjciupdatea.so` (disassembly-proven); sticks mount but never execute. Serial `cmu` login (uid 0) is the working root route | see V74.md |
-| SSH | stock sshd on port 36000, keys in `/data_persist` | stock sshd reads `AuthorizedKeysFile /config-mfg/authorized_keys` (Mazda key only); own sshd needed (`ssh/sshd_config_v74`). `neutralizeid7` deletes the autorun hook on every update | see V74.md |
+| SSH | stock sshd on port 36000, keys in `/data_persist` | stock sshd reads `AuthorizedKeysFile /config-mfg/authorized_keys` (Mazda key only); own sshd on **2222** needed (`net/sshd-up-v74.sh`). `neutralizeid7` deletes the autorun hook on every update | see V74.md |
 | Firewall | permissive | `jci-fw.sh`: `-P INPUT DROP` + ICMP echo-request dropped; TCP 36000 accepted (not on wlan0) | ping fails, SSH works — see V74.md |
 | GUI terminal | `ReadDTC testId=22` works via `systemHooks.sh 22` | stock v74 drops testId=22 (`startSystemScripts.sh` knows only code 11); terminal = diag menu item 10 (page 2) | patch startSystemScripts.sh to delegate — see V74.md |
 | stage scripts | content + hook points | shebang-only (empty) except `start_network.sh` (root, loads usbnet/asix, eth1, sshd) | hook still works via `sm` |
@@ -208,15 +208,15 @@ running, SD card removed).
 - v74.00.324A **automatically removes** most tweaks/customizations (AIO etc.).
   Installing tweaks on v74 has been reported to cause WiFi problems, Bluetooth
   issues and Android Auto/CarPlay crashes that cannot be undone.
-- The classic USB-tweak path is gone on v74 (see section 3 above: autorun
-  blocked, serial is not a working login). What **does** survive an update to
-  v74 is the stock SSH on port 36000 with the pubkey in
-  `/config-mfg/authorized_keys` (NOR flash, never overwritten) and the
-  `jci-autorun` USB hook present in the v74 binary - see
-  [ROOT-ACCESS.md](ROOT-ACCESS.md) sections 1-5.
+- The classic USB-autorun path is gone on v74: the `jci-autorun` hook is
+  **compiled out** of the firmware (not just blocked) and the USB rescue stick
+  never fires. The working root routes on v74 are **serial `cmu` login** (uid 0)
+  and the **diag menu terminal** — full recipe in [V74.md](V74.md). Note that
+  the stock SSH on port 36000 only accepts **Mazda's** key from
+  `/config-mfg/authorized_keys` (NOR flash, never overwritten), not yours — so
+  you deploy your own sshd on 2222 after regaining a shell.
 - If a `reinstall.up` wipes `/data_persist` (`cleandatapersist/`), the toolkit
-  and autorun must be redeployed after the update (via `jci-autorun` on USB or
-  manually over SSH port 36000).
+  and bring-up must be redeployed after the update — see [V74.md](V74.md).
 - Bootloop/restart after the v74 update: remove the SD card and do a Factory
   Reset (engine running, SD card out). A cracked/aged display can block the
   Test Screen and prevent the update from starting.
