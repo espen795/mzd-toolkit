@@ -324,7 +324,7 @@ with PdfPages(OUT) as pdf:
     xs = np.linspace(0, v.max() + 3, 50)
     for n, lo, hi in GEARS:
         mid = (lo + hi) / 2; ax.plot(xs, xs * mid, ls="--", lw=.7, color=CG)
-        xe = min(vg.max() + 1, rpm.max() * 1.1 / mid); ax.text(xe, xe * mid, f" {n}", fontsize=8, color=CG)
+        xe = min(vg.max() + 1, rpm.max() * 1.1 / mid); ax.text(xe, xe * mid, f" {disp(n)}", fontsize=8, color=CG)
     ax.set_xlim(0, vg.max() + 4); ax.set_ylim(0, rpm.max() * 1.15)
     ax.set_xlabel("speed km/h"); ax.set_ylabel("engine speed rpm (estimated)"); ax.legend(frameon=False)
     ax.set_title("RPM vs speed - each line = one gear"); ax.grid(alpha=.25)
@@ -564,6 +564,6 @@ with PdfPages(OUT) as pdf:
     d = pdf.infodict(); d["Title"] = "Mazda CMU trip overview"; d["Author"] = "mzd-toolkit"
 
 print(f"drive {DRIVE_FROM:.0f}-{DRIVE_TO:.0f}s gps span", t_of(gpsu[0][0]), t_of(gpsu[-1][0]), "rpm0-time", (rg<100).sum()*0.5)
-print(f"OK {OUT}  duur={DUR/60:.1f}min  dist={dist_km:.2f}km gps={gps_km:.2f}km  vmax={v.max():.1f}  "
+print(f"OK {OUT}  dur={DUR/60:.1f}min  dist={dist_km:.2f}km gps={gps_km:.2f}km  vmax={v.max():.1f}  "
       f"fuelpulses={fuel_pulses}  gears={ {disp(k): round(x/60, 2) for k, x in gear_time.items()} }")
 print("ratio hist (moving):", np.histogram(ratio[~np.isnan(ratio)], bins=[0, 18, 22.5, 27.5, 34, 45, 70, 140, 999])[0])

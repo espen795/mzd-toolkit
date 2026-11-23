@@ -1,5 +1,27 @@
 # Trip analysis tools
 
+## Sample report (synthetic data - no real trip)
+
+So you can see what the report looks like without a car, the repo ships a
+full **11-page sample PDF** rendered from a procedurally generated capture.
+Everything in it is invented: the route is dead-reckoned over a generic public
+area and contains **no real GPS or personal data**.
+
+| Summary page | Route page |
+|---|---|
+| ![summary](sample/preview-summary.png) | ![route](sample/preview-route.png) |
+
+Full PDF: [`sample/sample-overview.pdf`](sample/sample-overview.pdf). Regenerate it
+with:
+
+```sh
+python3 make_sample_capture.py sample-trip.raw     # synthetic dbus-monitor .raw
+python3 make_overview_pdf.py sample-trip.raw sample-overview.pdf
+```
+
+`make_sample_capture.py` is a demo generator only - it is never needed to
+analyze a real capture.
+
 Analyze a raw `dbus-monitor` capture from the Mazda CMU service bus
 (`unix:path=/tmp/dbus_service_socket`). See `docs/VEHICLE-DATA-DBUS.md` for
 the signal list, the corrected scale factors and what is *not* available on

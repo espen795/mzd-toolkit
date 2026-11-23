@@ -22,6 +22,15 @@ v74, read **[docs/V74.md](docs/V74.md)** first — access, firewall, autorun and
 terminal event chain all changed. Use `toolkit-v59/` on v59 and for anything you
 want verified.
 
+## Sample trip report
+
+The toolkit can log the car's own D-Bus signals and render a trip report
+(speed, rpm, gears, g-forces, wheel speeds, GPS route). Here is a sample built
+from **synthetic data** (no real GPS) — full PDF and generator in
+[`tools/trip-analysis/`](tools/trip-analysis/):
+
+![sample trip report](tools/trip-analysis/sample/preview-summary.png)
+
 ## What it is
 
 The CMU is a Linux box. Once you have root on it (via any known exploit — serial, ID7, or the autorun method), this toolkit gives you:
