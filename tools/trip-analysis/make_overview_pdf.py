@@ -139,8 +139,20 @@ tst, st = series('com.jci.vbs.vdt', 'SteWhlComp_An_Est'); st = (st - 16384) / 12
 tth, th = series('com.jci.vbs.vdt', 'ApedPos_Pc_ActlArb'); th = th / 10.0
 tfu, fu = series('com.jci.vbs.vdt', 'FuelPulse')
 tbc, bcm = series('com.jci.vbs.bcm', 'CarSpeedResp')
-# bcm.CarSpeedResp covers the whole capture (Veh_V_ActlEng only while driving)
-vb = np.clip((bcm - 2500) * 4 / 100.0, 0, None)
+# bcm.CarSpeedResp covers the whole capture (Veh_V_ActlEng only while driving).
+# The standstill offset is firmware-dependent, so auto-detect it from the floor:
+#   v59: standstill 2500, km/h = (v-2500)/25       (= (v-2500)*4/100)
+#   v74: standstill 10000, km/h = (v-10000)/100
+if len(bcm):
+    _floor = float(np.percentile(bcm, 5))
+else:
+    _floor = 2500.0
+if _floor > 6000:          # v74
+    CARSPEED_FW = 'v74'
+    vb = np.clip((bcm - 10000) / 100.0, 0, None)
+else:                      # v59
+    CARSPEED_FW = 'v59'
+    vb = np.clip((bcm - 2500) * 4 / 100.0, 0, None)
 grid = np.arange(0, ta[-1, 1] - ta[0, 1], 0.5)
 
 
@@ -176,8 +188,10 @@ gps_km = float(sum(hav(a[1:], b[1:]) for a, b in zip(gpsu[:-1], gpsu[1:]))) \
 rpm_at_v = np.interp(tv, tr, rpm) if len(tv) and len(tr) else np.array([])
 moving = v > 5
 ratio = np.where(moving, rpm_at_v / np.maximum(v, 0.1), np.nan)
-# illustrative boundaries (rpm per km/h); calibrate with a dedicated drive
-GEARS = [('1', 95, 200), ('2', 48, 75), ('3', 33, 47.9), ('4?', 25, 32.9)]
+# Gearbox ratios (rpm per km/h) from a dedicated 1..6 calibration drive.
+# Centres ~113/59/40/31/25/20; these are mechanical and firmware-independent.
+GEARS = [('1', 80, 200), ('2', 48, 75), ('3', 34, 47.9),
+         ('4', 27.5, 33.9), ('5', 22.5, 27.4), ('6', 17, 22.4)]
 
 
 def gear_of(r):
@@ -276,12 +290,13 @@ with PdfPages(OUT) as pdf:
             ax.text(c, i_, ' %d' % c, va='center', fontsize=7.5)
     fig.text(0.53, 0.56, 'How to read this', fontsize=11, weight='bold')
     notes = [
-        '- Scales are the corrected 2026-11-17 values:',
-        '   CarSpeedResp = (v-2500)*4/100 km/h (2500 = standstill),',
-        '   rpm = raw x2 (estimated), GlobalRealTime unit = 0.1 s.',
+        '- CarSpeedResp detected as %s firmware:' % CARSPEED_FW,
+        '   v59 = (v-2500)/25 km/h, v74 = (v-10000)/100 km/h',
+        '   (2500 / 10000 = standstill); rpm = raw x2 (estimated),',
+        '   GlobalRealTime unit = 0.1 s.',
         '- Gear position is NOT on D-Bus (CAN 0x0FD -> cluster only).',
-        '   It is estimated here from rpm/speed; calibrate with a',
-        '   dedicated 1..6 shift drive before trusting the labels.',
+        '   It is estimated here from rpm/speed, calibrated against a',
+        '   dedicated 1..6 shift drive (ratios ~113/59/40/31/25/20).',
         '- Camera_high_temperature toggles continuously: heartbeat,',
         '   not a real warning.',
         '- Not visible via D-Bus: turn signals, doors, wipers,',

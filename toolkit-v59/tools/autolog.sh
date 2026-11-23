@@ -1,6 +1,6 @@
 #!/bin/sh
 # ============================================================
-# autolog.sh v2 - D-Bus vehicle-data autologger for the Mazda CMU
+# autolog.sh v3 - D-Bus vehicle-data autologger for the Mazda CMU
 #
 # Start from /data_persist/dev/bin/autorun (background) or manually via SSH:
 #   sh /data_persist/dev/bin/autolog.sh
@@ -88,13 +88,21 @@ find_usb() {
         [ -d "$d" ] || continue
         case "$d" in *nav*) continue ;; esac
         if touch "$d/.mzdtest" 2>/dev/null; then rm -f "$d/.mzdtest"; echo "$d"; return 0; fi
+        # v74 mounts USB sticks read-only: try to remount rw (v3)
+        if grep -q " $d vfat ro," /proc/mounts 2>/dev/null && mount -o remount,rw "$d" 2>/dev/null \
+           && touch "$d/.mzdtest" 2>/dev/null; then rm -f "$d/.mzdtest"; echo "$d"; return 0; fi
     done
     return 1
 }
 
+# USB can mount slowly after boot: wait up to USB_WAIT s. v3: never log to /tmp
+# (RAM) or /data_persist (flash wear) - only to a real USB stick.
+USB_WAIT="${USB_WAIT:-120}"
 USB="${LOG_USB:-$(find_usb)}"
+W=0
+while [ -z "$USB" ] && [ $W -lt "$USB_WAIT" ]; do sleep 5; W=$((W + 5)); USB="$(find_usb)"; done
 if [ -z "$USB" ]; then
-    echo "$(date) dbus-autolog: no writable USB stick, not started"
+    echo "$(date) dbus-autolog: no writable USB stick after ${USB_WAIT}s, not started"
     exit 1
 fi
 LOGDIR="$USB/dbus-logs"

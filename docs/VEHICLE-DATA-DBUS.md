@@ -44,7 +44,7 @@ table) - do not reuse those.
 | Signal | Type | Conversion | Status |
 |---|---|---|---|
 | `vdt.Veh_V_ActlEng` | uint16 | `/100` = km/h | verified (high); only sent while driving; reads ~10 % low vs. GPS distance |
-| `bcm.CarSpeedResp` | uint32 | `(v-2500)*4/100` = km/h, **2500 = standstill** | verified (high); linear relation `v = 2500 + Veh_V/4` observed |
+| `bcm.CarSpeedResp` | uint32 | **firmware-dependent offset** (see note) | verified (high) |
 | `vdt.EngAout_N_Actl` | uint16 | `x2` = rpm | estimated (raw ~350 at idle -> ~700 rpm); not checked against the tachometer |
 | `vdt.VehLong_A_Actl` | uint16 | `(v-4000)/100` = m/s^2 | estimated |
 | `vdt.Lateral_Acceleration` | uint16 | `(v-4000)/100` = m/s^2 | estimated |
@@ -62,7 +62,13 @@ table) - do not reuse those.
 Correction notes (mistakes made in an earlier analysis of the same data):
 
 - `bcm.CarSpeedResp` is **not** `/100` - that made standstill read as a
-  "constant 25 km/h"; 2500 is zero.
+  "constant 25 km/h".
+- **The CarSpeedResp standstill offset differs per firmware** (verified on both):
+  - **v59**: standstill `2500`, `km/h = (v-2500)/25` (= `(v-2500)*4/100`).
+  - **v74**: standstill `10000`, `km/h = (v-10000)/100`.
+  Analysing a v74 capture with the v59 formula (or vice versa) gives nonsense.
+  `make_overview_pdf.py` auto-detects the offset from the floor value, so you do
+  not have to pass a flag.
 - `vdt.EngAout_N_Actl` is **not** raw rpm - multiply by 2.
 - `GlobalRealTime` is **not** seconds - the unit is 0.1 s.
 
@@ -82,10 +88,22 @@ speed and rpm can deviate on the order of 10 %.
   (offset 3). It goes from the PCM to the instrument cluster, **not** via the
   VIP to the CMU. Readable only with an OBD CAN adapter.
 - **Estimation from rpm/speed works**: each gear is a straight line in an
-  rpm-vs-speed plot. Illustrative example from one capture: the two dominant
-  clusters sat around 60 and 40 rpm per km/h (ratio ~1.5), consistent with
-  2nd and 3rd gear. Idle rpm while moving above ~9 km/h means coasting
-  (clutch in / neutral). The exact gear numbering is only certain after a
+  rpm-vs-speed plot, i.e. a fixed `rpm / km/h` ratio. From a dedicated 1..6
+  calibration drive on this 6-speed manual the ratios are approximately:
+
+  | Gear | rpm per km/h |
+  |---|---|
+  | 1 | ~113 |
+  | 2 | ~59 |
+  | 3 | ~40 |
+  | 4 | ~31 |
+  | 5 | ~25 |
+  | 6 | ~20 |
+
+  These are mechanical gearbox ratios, so they are firmware-independent (the
+  same on v59 and v74). `make_overview_pdf.py` uses them to label gears. Idle
+  rpm while moving above ~9 km/h means coasting (clutch in / neutral). The exact
+  gear numbering is only certain after a
   **calibration drive**: deliberately shift through 1..6 and note the speeds.
 
 ## 4. Not available via D-Bus at all

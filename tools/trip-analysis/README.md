@@ -45,6 +45,11 @@ Notes:
   scale factor is wrong.
 - The PDF has 6 pages: summary, timeline, shift behavior (estimated gear),
   driving dynamics, route + warnings, data inventory.
+- `CarSpeedResp` has a different standstill offset on v59 (2500) and v74
+  (10000); `make_overview_pdf.py` auto-detects it from the floor value and
+  prints which it used on the data-inventory page. See `docs/VEHICLE-DATA-DBUS.md`.
+- Gear labels use `rpm / km/h` ratios from a dedicated 1..6 calibration drive
+  (~113/59/40/31/25/20); these are mechanical and the same on v59 and v74.
 
 ## PRIVACY
 
@@ -56,7 +61,7 @@ page 5 (route) from the PDF before sharing it.
 
 | Signal | Conversion |
 |---|---|
-| `bcm.CarSpeedResp` (uint32) | `(v-2500)*4/100` = km/h, 2500 = standstill |
+| `bcm.CarSpeedResp` (uint32) | firmware-dependent: v59 `(v-2500)/25`, v74 `(v-10000)/100` km/h (auto-detected) |
 | `vdt.Veh_V_ActlEng` (uint16) | `v/100` = km/h (only sent while driving) |
 | `vdt.EngAout_N_Actl` (uint16) | `v*2` = rpm (estimated) |
 | `vdt.VehLong_A_Actl` / `vdt.Lateral_Acceleration` | `(v-4000)/100` = m/s^2 |
