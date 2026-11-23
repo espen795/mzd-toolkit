@@ -38,7 +38,11 @@ Notes:
 
 - Run `make_overview_pdf.py` with plain `python3`, **not** `python3 -I`:
   numpy/matplotlib live in the user site-packages. Requires numpy and
-  matplotlib.
+  matplotlib. For the route page (`osm_map.py`) it also needs `requests` and
+  `Pillow`; without them the PDF is still produced, just without the OSM map.
+- `osm_map.py` draws an OpenStreetMap background behind the GPS route and also
+  writes a standalone Leaflet map `<out>-map.html`. OSM tiles are fetched once
+  and cached under `~/.cache/osm-tiles/`.
 - `make_overview_pdf.py` prints a control line at the end:
   `OK <file> dur=... dist=... gps=... ...`. `dist` (integrated speed) and
   `gps` (haversine over the GPS fixes) should agree within ~15 %; if not, a
@@ -54,8 +58,9 @@ Notes:
 ## PRIVACY
 
 A raw capture contains **GPS coordinates and timestamps of real trips**.
-Treat it as personal data: never commit or publish `.raw` files, and strip
-page 5 (route) from the PDF before sharing it.
+Treat it as personal data: never commit or publish `.raw` files, the
+`<out>-map.html` Leaflet map, or page 5 (route) of the PDF - all three contain
+the real route. Strip the route page and delete the `-map.html` before sharing.
 
 ## Corrected scale factors (do not reuse the old ones)
 
