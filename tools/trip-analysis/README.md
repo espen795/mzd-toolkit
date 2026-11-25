@@ -3,13 +3,13 @@
 ## Sample report (synthetic data - no real trip)
 
 So you can see what the report looks like without a car, the repo ships a
-full **11-page sample PDF** rendered from a procedurally generated capture.
+full **14-page sample PDF** rendered from a procedurally generated capture.
 Everything in it is invented: the route is dead-reckoned over a generic public
 area and contains **no real GPS or personal data**.
 
-| Summary page | Route page |
-|---|---|
-| ![summary](sample/preview-summary.png) | ![route](sample/preview-route.png) |
+| Summary page | Driving style | Route page |
+|---|---|---|
+| ![summary](sample/preview-summary.png) | ![driving style](sample/preview-driving-style.png) | ![route](sample/preview-route.png) |
 
 Full PDF: [`sample/sample-overview.pdf`](sample/sample-overview.pdf). Regenerate it
 with:
@@ -53,7 +53,7 @@ All paths are command-line arguments; nothing is hardcoded.
 ```sh
 python3 parse_dbus.py   <dump.raw> [events.csv]   # events + per-signal stats
 python3 analyze_trip.py <dump.raw>                # text stats + ASCII charts
-python3 make_overview_pdf.py <dump.raw> <out.pdf> # 6-page PDF overview
+python3 make_overview_pdf.py <dump.raw> <out.pdf> # 14-page PDF overview
 ```
 
 Notes:
@@ -69,8 +69,15 @@ Notes:
   `OK <file> dur=... dist=... gps=... ...`. `dist` (integrated speed) and
   `gps` (haversine over the GPS fixes) should agree within ~15 %; if not, a
   scale factor is wrong.
-- The PDF has 6 pages: summary, timeline, shift behavior (estimated gear),
-  driving dynamics, route + warnings, data inventory.
+- The PDF has up to 14 pages: summary, timeline, shift behavior, **driving
+  style score + shift quality** (`driving_style.py`, needs v74
+  `bcm.GearPosNotification`), driving dynamics, wheel speeds, speed vs. limit,
+  engine / i-Stop / brakes, OSM route map, route + warnings, data inventory.
+  Sections whose signals are missing are skipped.
+- `driving_style.py` scores a trip 0-10 from shift jerk (clutch in / engaging),
+  shift rpm, acceleration, braking, engine-friendliness and speed constancy.
+  Shifts are detected as `gear -> 0 -> gear'` (0 = clutch pressed); shifts with
+  the brake pedal pressed are excluded. The scale is our own, not an official norm.
 - `CarSpeedResp` has a different standstill offset on v59 (2500) and v74
   (10000); `make_overview_pdf.py` auto-detects it from the floor value and
   prints which it used on the data-inventory page. See `docs/VEHICLE-DATA-DBUS.md`.

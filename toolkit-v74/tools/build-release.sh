@@ -62,6 +62,8 @@ echo "[1/6] Copy toolkit -> stage (exclusions: logs/ backups/ .git *.log STOP mz
     --exclude='./ssh/id_mzd' \
     --exclude='./ssh/id_mzd.pub' \
     --exclude='./tools/tests' \
+    --exclude='./aa/payload/*.patched' \
+    --exclude='*.so' \
     . ) | ( cd "$PKGDIR" && tar -xf - )
 
 # Sanity: menu.sh + lib/common.sh must be present

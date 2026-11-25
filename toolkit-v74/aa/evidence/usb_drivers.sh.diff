@@ -1,0 +1,10 @@
+--- usb_drivers.sh.stock
++++ usb_drivers.sh.v2-hook
+@@ -23,5 +23,7 @@
+ 
+ echo 0 > /proc/sys/net/ipv6/conf/usb0/accept_dad
+ 
++# MZD-AA-BUSPATCH: aa-early.sh op achtergrond, max ~15 s gewacht (guarded, faalt open)
++[ -f /data_persist/dev/aa/aa-early.sh ] && { /bin/sh /data_persist/dev/aa/aa-early.sh </dev/null >/dev/null 2>&1 & aa_p=$!; aa_i=0; while [ $aa_i -lt 15 ] && kill -0 $aa_p 2>/dev/null; do sleep 1; aa_i=$((aa_i + 1)); done; }
+ touch /var/run/usb_driver_ready
+ 

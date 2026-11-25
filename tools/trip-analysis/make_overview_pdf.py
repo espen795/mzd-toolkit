@@ -245,12 +245,12 @@ def tmin(x): return x / 60.0
 with PdfPages(OUT) as pdf:
     # ===== 1. Summary =====
     fig = plt.figure(figsize=A4); header(fig, "Trip overview - what the CMU tells us",
-        f"Source: {os.path.basename(SRC)}  |  {T0:%H:%M:%S} - {T1:%H:%M:%S} (CMU clock)  |  {len(events):,} D-Bus messages".replace(",", "."))
+        f"Source: {os.path.basename(SRC)}  |  {T0:%H:%M:%S} - {T1:%H:%M:%S} (CMU clock)  |  {len(events):,} D-Bus messages")
     kpis = [("Logged", f"{DUR/60:.1f} min"), ("Distance (speed)", f"{dist_km:.2f} km"),
             ("Distance (GPS)", f"{gps_km:.2f} km"), ("Max speed", f"{vg.max():.0f} km/h"),
             ("Driving", f"{(DRIVE_TO-DRIVE_FROM)/60:.1f} min"), ("Max rpm", f"~{rpm.max():.0f} rpm"),
             ("Max G long.", f"{np.abs(alo).max()/9.81:.2f} g"), ("Max G lat.", f"{np.abs(ala).max()/9.81:.2f} g"),
-            ("Standstill", f"{gear_time['stil/<5']/DUR*100:.0f} %"), ("Fuel pulses", f"{fuel_pulses:,}".replace(",", ".")),
+            ("Standstill", f"{gear_time['stil/<5']/DUR*100:.0f} %"), ("Fuel pulses", f"{fuel_pulses:,}"),
             ("Gear shifts", f"{shifts}" if HAS_GP else "-"), ("Brake presses", f"{brake_presses}"),
             ("i-Stop engine off", f"{istop_n}x"),
             ("Above limit (+5)", f"{over_pct:.0f} %" if HAS_LIM else "-"),
@@ -348,6 +348,18 @@ with PdfPages(OUT) as pdf:
            f"{shifts} shifts into a gear." if HAS_GP else ""]
     for k, s in enumerate(txt): fig.text(0.64, 0.42 - k * 0.028, s, fontsize=9, weight="bold" if k == 0 else None)
     pdf.savefig(fig); plt.close(fig)
+
+    # ===== 3b. Driving style + shift quality (driving_style.py) =====
+    if HAS_GP:
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            import driving_style
+            DS = driving_style.analyse(dict(tv=tv, v=v, tr=tr, rpm=rpm, tlo=tlo, alo=alo, tth=tth, th=th,
+                                            gp_t=gp_t, gp_v=gp_v, br_t=br_t, br_v=br_v, dist_km=dist_km, tfu=tfu, fu=fu))
+            driving_style.pages(pdf, DS, header, plt, A4)
+            print("driving style:", {driving_style.disp(k): round(x, 1) for k, x in DS["scores"].items()})
+        except Exception as e:
+            import traceback; traceback.print_exc(); print("driving style skipped:", e)
 
     # ===== 4. Driving dynamics =====
     fig = plt.figure(figsize=A4); header(fig, "Driving dynamics", "G-forces, " + ("steering angle" if HAS_STEER else "brake pedal") + " and throttle usage")

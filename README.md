@@ -2,6 +2,19 @@
 
 A shell-script toolkit for the **Mazda Connect CMU** (the infotainment head unit) — WiFi connectivity, SSH access, USB tethering, wired LAN via USB dongle, vehicle data over D-Bus, full partition backups, and a GUI terminal shortcut. Runs entirely on the car, delivered on a FAT32 USB stick.
 
+## 🚗 NEW: Android Auto on v74 — with the ORIGINAL USB hub, no hardware swap
+
+**Android Auto works on firmware v74.00.324 through the stock Desay hub** — no
+retrofit hub, no rewiring. Two 1-byte software patches (usbmgr bus check +
+aapa hub-scheme availability), bind-mounted at boot from `/data_persist`; the
+stock rootfs binaries are never overwritten. Brick-protected: md5 checks, crash
+counter that falls back to stock after 3 failed boots, health guard, one-command
+uninstall. Verified on real hardware.
+
+→ **[docs/ANDROID-AUTO-V74.md](docs/ANDROID-AUTO-V74.md)** · kit:
+[`toolkit-v74/aa/`](toolkit-v74/aa/) (you patch your own stock files with
+`make-patched.py` — no Mazda binaries are shipped).
+
 > **Target hardware:** Mazda Connect CMU, firmware **v59.00.502** (primary —
 > this toolkit is built and hardware-tested on v59). v74.00.324A is documented
 > but **different**: after a v74 update your SSH keys, autorun hook and firewall
@@ -15,7 +28,7 @@ A shell-script toolkit for the **Mazda Connect CMU** (the infotainment head unit
 | Folder | Firmware | Status |
 |---|---|---|
 | [`toolkit-v59/`](toolkit-v59/) | v59.00.502 | **Hardware-tested** — the primary, proven toolkit |
-| [`toolkit-v74/`](toolkit-v74/) | v74.00.324A | **Untested** except the SSH bring-up (`net/sshd-up-v74.sh`, proven on v74). v59 base + v74 deltas (`lib/ensure-rw.sh`, `ssh/sshd_config_v74`, `net/sshd-up-v74.sh`) |
+| [`toolkit-v74/`](toolkit-v74/) | v74.00.324A | **Proven on v74:** SSH bring-up (`net/sshd-up-v74.sh`), **Android Auto on the original hub** (`aa/`), D-Bus trip logging. Rest of the v59 base untested on v74. v74 deltas: `lib/ensure-rw.sh`, `ssh/sshd_config_v74`, `net/sshd-up-v74.sh`, `aa/` |
 
 The two folders are ~identical; v74 only differs where it has to. If you are on
 v74, read **[docs/V74.md](docs/V74.md)** first — access, firewall, autorun and the
@@ -62,6 +75,8 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
 | Full partition backup (`tools/backup.sh`, dd) | ✅ Tested | Long-running; disable the hardware watchdog first; verify sizes after |
 | CAN/VIM vehicle data (`tools/can-monitor.sh`, `tools/vehicle-data.sh`) | ✅ Tested | Passive D-Bus monitor; meaningful data needs ignition on |
 | Release builder (`tools/build-release.sh`) | ✅ Tested | tar.gz primary (CMU has no `unzip`), zip for PC, SHA256SUMS, post-build secrets scan that fails the build |
+| **Android Auto on v74, original hub** (`toolkit-v74/aa/`) | ✅ Tested on v74 hardware | Two 1-byte patches bind-mounted at boot, stock rootfs untouched; crash counter + guard fall back to stock; no hub swap needed. See docs/ANDROID-AUTO-V74.md |
+| D-Bus trip report (`tools/trip-analysis/`) | ✅ Tested (v59 + v74) | 14-page PDF: speed/rpm/gears, driving-style score + shift quality, g-forces, wheel speeds, i-Stop/brakes, OSM route map |
 | v74 long-term stability | ❌ Not working | Watchdog resets + TX flush loops; roll back to v59. **v74 also resets your access on every update** (see docs/V74.md): own sshd needed (`/config-mfg/authorized_keys` = Mazda key only), `neutralizeid7` wipes the autorun hook, USB autorun is compiled out, ICMP is firewalled |
 | Other USB dongles (non-ASIX/RTL8152) | ❓ Untested | |
 | iOS USB tethering | ❌ Not working | kernel lacks `iph_eth` |
@@ -169,6 +184,7 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 - [docs/VEHICLE-DATA-DBUS.md](docs/VEHICLE-DATA-DBUS.md) — vehicle data over D-Bus (corrected scales), `toolkit-v59/tools/autolog.sh`, [tools/trip-analysis/](tools/trip-analysis/)
 - [docs/FIRMWARE.md](docs/FIRMWARE.md) — part numbers, connector pinout, v59 vs v74, v74 update procedure
 - [docs/V74.md](docs/V74.md) — **v74: regaining and keeping root** (verified on real hardware). The working SSH recipe ([`toolkit-v59/net/sshd-up-v74.sh`](toolkit-v59/net/sshd-up-v74.sh), own sshd on 2222), neutralizeid7, firewall/ICMP, USB autorun compiled out, serial `cmu` root, start_network.sh hook
+- [docs/ANDROID-AUTO-V74.md](docs/ANDROID-AUTO-V74.md) — **Android Auto on v74 with the original hub** (no hardware swap): the two 1-byte patches, brick protection, install via `make-patched.py`, command reference
 - [docs/V74-GUI-TERMINAL.md](docs/V74-GUI-TERMINAL.md) — v74 GUI terminal event chain: ReadDTC 22 dropped on stock, diag menu item 10, systemHooks.sh 22, synthetic input via D-Bus/uinput
 - [docs/research/](docs/research/) — v74 background: v59-vs-v74 rootfs diff, safe update procedure (ASH8, wipe-vs-survive)
 - [docs/CMU-SWAP-COMPATIBILITY.md](docs/CMU-SWAP-COMPATIBILITY.md) — which CMU units can be swapped in

@@ -1,0 +1,4 @@
+113421c113421
+<    bca24:	0a00001a 	beq	bca94 <_ZN28CUsbMgrUSBDeviceTypeDetector19checkDevAndroidAutoEv+0x360>
+---
+>    bca24:	ea00001a 	b	bca94 <_ZN28CUsbMgrUSBDeviceTypeDetector19checkDevAndroidAutoEv+0x360>

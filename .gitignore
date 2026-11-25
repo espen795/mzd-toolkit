@@ -33,3 +33,9 @@ core.*
 # Editor/OS cruft
 *~
 .DS_Store
+
+# AA kit: never commit Mazda/JCI binaries (generated from the user's own stock files)
+toolkit-v74/aa/payload/*.patched
+*.so
+__pycache__/
+*.pyc

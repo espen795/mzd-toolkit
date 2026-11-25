@@ -1,0 +1,8 @@
+2c2
+< blmjciaapa.so.orig:     file format elf32-littlearm
+---
+> blmjciaapa.so.patched:     file format elf32-littlearm
+25189c25189
+<    653b4:	e3a02001 	mov	r2, #1
+---
+>    653b4:	e3a02002 	mov	r2, #2
