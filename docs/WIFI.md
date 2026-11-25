@@ -90,6 +90,14 @@ hardware failure (deterministic PC).
 | mr firmware | Rev 7.3.10.10.136 | Rev 7.5.7.0.50 |
 | observed watchdog crashes | yes | **more** — rollback to v59 recommended |
 
+**Update - suspected hardware defect.** WiFi also fails on **fully stock v74
+software** (no toolkit, no firmware swaps), and none of the fixes in section 4
+made it reliable on any firmware tried. The working hypothesis is now a
+**defective WL1271 chip / RF path on this particular CMU**, not a software
+problem. This is not proven (no second unit tested). If your CMU's WiFi works
+on stock firmware, the fixes below may still help with the power-save related
+deauths; if it fails on stock as well, use USB ethernet or USB tethering.
+
 `wifi/rollback-firmware-v59.sh` (menu Tools → 10) restores the v59 firmware set
 while keeping your board's NVS.
 

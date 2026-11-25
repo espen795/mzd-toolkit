@@ -75,11 +75,19 @@ Correction notes (mistakes made in an earlier analysis of the same data):
 The scales were derived from a capture, not verified against the dashboard;
 speed and rpm can deviate on the order of 10 %.
 
-## 3. Gear position is NOT available on D-Bus
+## 3. Gear position on D-Bus: v74 yes, v59 no
 
-- `bcm.GetGearPos` returns `UnknownMethod`; `GearPosNotification` was never
-  observed. (The D-Bus method lists in CANBUS-VIM.md come from other firmware
-  versions - on this unit the signal simply is not delivered.)
+- **v74 (observed, not fully verified):** `com.jci.vbs.bcm.GearPosNotification`
+  IS delivered while driving. Observed values: `1`..`6` = the engaged gear,
+  `0` = no gear (clutch pressed or neutral; every shift shows a short
+  `g -> 0 -> g'` phase), `14` = seen while parking, probably reverse.
+  The 1..6 values matched the rpm/speed estimate below (~100 % agreement) on two
+  real trips. **Still to test:** the exact meaning of 0 (clutch vs neutral) and
+  14 (reverse), and whether the shift-phase timing is accurate enough for the
+  shift-quality scores in `driving_style.py`.
+- **v59:** `bcm.GetGearPos` returns `UnknownMethod` and `GearPosNotification` was
+  never observed. (The D-Bus method lists in CANBUS-VIM.md come from other
+  firmware versions.) On v59 use the rpm/speed estimate below.
 - CAN `0x228` (`TransmDesiredGearPosition`) belongs to the **automatic**
   transmission (TCM) and does not exist on a manual gearbox.
 - The number shown next to the speed in the instrument cluster is the PCM
@@ -87,7 +95,7 @@ speed and rpm can deviate on the order of 10 %.
   `Warn_SilGearPos_D_Dsply` (3 bits, offset 11) + `Warn_ShiftIndicatorLight`
   (offset 3). It goes from the PCM to the instrument cluster, **not** via the
   VIP to the CMU. Readable only with an OBD CAN adapter.
-- **Estimation from rpm/speed works**: each gear is a straight line in an
+- **Estimation from rpm/speed works** (all firmware; the fallback on v59): each gear is a straight line in an
   rpm-vs-speed plot, i.e. a fixed `rpm / km/h` ratio. From a dedicated 1..6
   calibration drive on this 6-speed manual the ratios are approximately:
 

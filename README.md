@@ -77,7 +77,8 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
 | Release builder (`tools/build-release.sh`) | ✅ Tested | tar.gz primary (CMU has no `unzip`), zip for PC, SHA256SUMS, post-build secrets scan that fails the build |
 | **Android Auto on v74, original hub** (`toolkit-v74/aa/`) | ✅ Tested on v74 hardware | Two 1-byte patches bind-mounted at boot, stock rootfs untouched; crash counter + guard fall back to stock; no hub swap needed. See docs/ANDROID-AUTO-V74.md |
 | D-Bus trip report (`tools/trip-analysis/`) | ✅ Tested (v59 + v74) | 14-page PDF: speed/rpm/gears, driving-style score + shift quality, g-forces, wheel speeds, i-Stop/brakes, OSM route map |
-| v74 long-term stability | ❌ Not working | Watchdog resets + TX flush loops; roll back to v59. **v74 also resets your access on every update** (see docs/V74.md): own sshd needed (`/config-mfg/authorized_keys` = Mazda key only), `neutralizeid7` wipes the autorun hook, USB autorun is compiled out, ICMP is firewalled |
+| WiFi (TI WL1271) on this unit | ❌ Not working | Firmware watchdog resets + TX-flush loops on v59, on v74, and with the v74 chip firmware on v59. It also fails on fully stock v74 software, so a **defective WiFi chip on this particular CMU is suspected** - not proven. Unknown whether other units are affected. Use USB ethernet or USB tethering instead |
+| v74 in daily use | ✅ Works (except WiFi) | Driven daily on v74 with Android Auto, SSH and D-Bus logging. **WiFi does not work** on this unit - see the row below. **v74 also resets your access on every update** (see docs/V74.md): own sshd needed (`/config-mfg/authorized_keys` = Mazda key only), `neutralizeid7` wipes the autorun hook, USB autorun is compiled out, ICMP is firewalled |
 | Other USB dongles (non-ASIX/RTL8152) | ❓ Untested | |
 | iOS USB tethering | ❌ Not working | kernel lacks `iph_eth` |
 
@@ -168,7 +169,7 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 
 **Works (verified on v59.00.502 hardware):** WiFi via NMS, watchdog recovery, SSH pubkey (RSA-2048) and password (DES hash) on port 36000, Android USB tethering (CDC and Samsung RNDIS with rndis_host v3), ASIX AX88772 + RTL8152 on `eth1`, terminal menu injection, dd backups, release build + sha256.
 
-**Doesn't / not tested:** v74 firmware long-term stability (watchdog loops → roll back to v59), iOS tethering, USB WiFi dongles other than rt2800 (experimental `wlan1` path), dongles other than ASIX/RTL8152, long-running backups under load without the watchdog disabled.
+**Doesn't / not tested:** WiFi on this unit (watchdog loops on every firmware tried, incl. stock v74 - suspected chip defect), iOS tethering, USB WiFi dongles other than rt2800 (experimental `wlan1` path), dongles other than ASIX/RTL8152, long-running backups under load without the watchdog disabled.
 
 ## Documentation
 
