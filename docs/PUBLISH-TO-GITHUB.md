@@ -2,7 +2,7 @@
 
 You do NOT need to give anyone (including an AI assistant) your GitHub API key or
 password. GitHub push happens from **your own machine** with **your own** credentials.
-The repo on disk is already clean and sanitized — see SECURITY-AUDIT.md.
+The repo on disk is already clean and sanitized.
 
 ## 1. The repo already exists (public, empty initial commit)
 

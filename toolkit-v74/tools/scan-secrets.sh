@@ -46,9 +46,8 @@ scan_dir() {
     _found=0
 
     # --- text files: generic layer (case-sensitive) ---
-    # Self-exclusion: this scanner and SECURITY-AUDIT.md document the pattern
-    # strings themselves, so they must not be flagged as findings.
-    _out=$(grep -rInE "$GENERIC_KEYS|$GENERIC_PATHS|$GENERIC_IP" "$_dir" --exclude-dir=.git --exclude=scan-secrets.sh --exclude=SECURITY-AUDIT.md 2>/dev/null | grep -vE "$ALLOW_LINE" | head -200)
+    # Self-exclusion: only this scanner itself (it holds generic pattern strings).
+    _out=$(grep -rInE "$GENERIC_KEYS|$GENERIC_PATHS|$GENERIC_IP" "$_dir" --exclude-dir=.git --exclude=scan-secrets.sh 2>/dev/null | grep -vE "$ALLOW_LINE" | head -200)
     if [ -n "$_out" ]; then
         echo "[FINDING] generic patterns (keys / tokens / user paths / internal IPs):"
         echo "$_out" | cut -c1-200 | sed 's/^/    /'
@@ -57,7 +56,7 @@ scan_dir() {
 
     # --- text files: personal layer (case-insensitive) ---
     if [ -n "$PERSONAL" ]; then
-        _out=$(grep -rInEi "$PERSONAL" "$_dir" --exclude-dir=.git --exclude=scan-secrets.sh --exclude=SECURITY-AUDIT.md --exclude=RELEASE-CHECKLIST.md 2>/dev/null | head -200)
+        _out=$(grep -rInEi "$PERSONAL" "$_dir" --exclude-dir=.git --exclude=scan-secrets.sh 2>/dev/null | head -200)
         if [ -n "$_out" ]; then
             echo "[FINDING] personal denylist patterns ($DENYLIST):"
             echo "$_out" | cut -c1-200 | sed 's/^/    /'
