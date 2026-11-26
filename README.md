@@ -197,6 +197,8 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 
 ## Related projects
 
+- [mzd-cmu-ui](https://github.com/espen795/mzd-cmu-ui) - **sister project (DRAFT):** an alternative dark "B2" UI layer for the CMU on v74, injected at runtime via a bind-mounted overlay (stock files untouched). Needs the SSH access from this toolkit.
+
 - [MZD-AIO / mazdatweaks](https://github.com/Trevelopment/MZD-AIO) — the well-known all-in-one tweaks installer (mazdatweaks.com)
 - [mazdatweaks](https://github.com/Trevelopment/mazdatweaks) — individual tweaks collection
 - [cmu-autorun](https://github.com/Trevelopment/cmu-autorun) — autorun/recovery scripts for re-enabling USB autorun on patched firmware
