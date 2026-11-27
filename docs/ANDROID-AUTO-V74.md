@@ -39,6 +39,8 @@ Boot order (from the v74 `sm.conf`): `usb_drivers` (sets the `ready_flag`) -> `j
 
 The hook is the **only rootfs change**: 2 lines in `/jci/scripts/usb_drivers.sh`, directly before `touch /var/run/usb_driver_ready`. It starts `aa-early.sh` in the background and waits at most about 15 s; afterwards the `touch` happens anyway (fail-open -> stock). Backup `usb_drivers.sh.aabak`. md5 of `usb_drivers.sh`: stock `a52bb42330acedf809da1f02ab76b07d`, with hook `cb2b34823582b55740c8134360c183c1`.
 
+`aa-early.sh` is also the boot hook for the optional *Applications -> Terminal* kit (`toolkit-v74/terminal/`): if `/data_persist/dev/gui/gui-early.sh` exists it is started in the background (detached, it never touches the AA state); if not, nothing happens.
+
 On the CMU the kit lives in `/data_persist/dev/aa/`:
 
 ```

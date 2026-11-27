@@ -60,6 +60,9 @@ finish() { kill "$WD" 2>/dev/null; exit 0; }
 md5() { md5sum "$1" 2>/dev/null | cut -d' ' -f1; }
 isnum() { case "$1" in ''|*[!0-9]*) return 1 ;; esac; return 0; }
 T0=$(up)
+# OEMPLUS gui-early (2026-11-27): los van AA (Terminal-item in Applicaties). Dubbele fork op de
+# achtergrond: wacht nergens op, raakt geen AA-variabelen, overleeft de 14 s-watchdog van dit script.
+[ -f /data_persist/dev/gui/gui-early.sh ] && ( /bin/sh /data_persist/dev/gui/gui-early.sh </dev/null >/dev/null 2>&1 & ) 2>/dev/null
 # --- proven-record (kit 3.1). Identiek in aa-early.sh, aa-guard.sh en aa-status.sh. ---
 # $AA/proven (max 1 KB):  short=<n>                (boots op rij zonder guard-oordeel in proven mode)
 #                         rec=<aantal> <fingerprint>  (gezonde boots per doelcombinatie, max 1 per fp)

@@ -178,7 +178,8 @@ case "$cmd" in
             echo "  Terminal still running - force kill..."
             kill -9 $(pidof terminal) 2>/dev/null
         fi
-        ivi-shell -f "Main" > /dev/null 2>&1 || true
+        # v74 has no surface "Main": bring the Opera GUI surface back to the front
+        (XDG_RUNTIME_DIR=/tmp ivi-shell -f JCI_OPERA_PRIMARY >/dev/null 2>&1 &); sleep 2; killall ivi-shell 2>/dev/null
         echo "  Terminal stopped"
         ;;
 

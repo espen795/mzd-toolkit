@@ -71,6 +71,7 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
 | SSH password auth | ⚠️ Works only if `/` is writable | v59 libcrypt accepts **DES hashes only** (13 chars, no `$` prefix); brute-forceable over WiFi — prefer pubkey |
 | USB tethering (Android, CDC) | ✅ Tested | Samsung RNDIS PID `04e8:6863` works with `rndis_host` v3; AOA/MTP PID `04e8:6860` does **not** give `usb0`; iOS tethering **not supported** (no `iph_eth` in kernel) |
 | USB ethernet dongle `eth1` | ⚠️ Experimental | ASIX AX88772 (`0b95:772a`) via built-in `asix`; RTL8152 (`0bda:8152`) via `cdc_ether` + `new_id` bind (no `r8152` module needed); registration can take up to ~60 s after boot |
+| Terminal item in Applications, v74 (`toolkit-v74/terminal/`) | ✅ Tested on v74 hardware | Bind-mounted `systemApp.js` patch built from your own stock file, opens the terminal via a local inetd trigger; greyed out while driving (driving itself not tested yet) |
 | Terminal menu patch (`tools/add-terminal-menu.sh`) | ✅ Tested | Patches `syssettingsApp.js` `_SystemTabHelperArray` with `uiaId="diag"`; reboot required |
 | Full partition backup (`tools/backup.sh`, dd) | ✅ Tested | Long-running; disable the hardware watchdog first; verify sizes after |
 | CAN/VIM vehicle data (`tools/can-monitor.sh`, `tools/vehicle-data.sh`) | ✅ Tested | Passive D-Bus monitor; meaningful data needs ignition on |
@@ -127,6 +128,16 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
 See [docs/INSTALL.md](docs/INSTALL.md) for the full walkthrough and [docs/USAGE.md](docs/USAGE.md) for every menu option and script.
 
 ## Terminal shortcut & switching menu/UI
+
+**v74:** a permanent **Terminal** item in *Applications* (greyed out while driving), RAM-only via a
+bind mount, no rootfs change - kit and install steps in
+[`toolkit-v74/terminal/`](toolkit-v74/terminal/). In `toolkit-v74`, option **4** starts the terminal
+through that kit's local trigger (`127.0.0.1:9997`) and option **5** returns to the GUI via the v74
+surface `JCI_OPERA_PRIMARY` (v74 has no surface `"Main"`).
+
+![v74 Applications menu with the Terminal item](docs/img/v74-applications-terminal.png)
+
+**v59** (below):
 
 - **System & security -> 4** starts the on-screen terminal instantly (MMUI
   `ReadDTC` D-Bus call with `testId=22`; fallbacks `/jci/scripts/run-terminal.sh`

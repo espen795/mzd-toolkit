@@ -397,21 +397,21 @@ system_menu() {
             2) "$TOOLKIT_DIR/system/remount-rw.sh"; pause ;;
             3) "$TOOLKIT_DIR/tools/fix-warning.sh"; pause ;;
             4)
-                # v4.8.3: direct via MMUI diag-code 22 - works WITHOUT GUI patch/reboot
-                echo "Starting terminal via MMUI ReadDTC testId=22..."
-                if [ -S /tmp/dbus_service_socket ]; then
-                    dbus-send --address="unix:path=/tmp/dbus_service_socket" --print-reply --reply-timeout=8000 \
-                        --dest=com.jci.testdiag /com/jci/testdiag com.jci.testdiag.ReadDTC int32:22 2>&1 | head -3
-                    echo "  (if this does not work: check if /jci/scripts/run-terminal.sh exists)"
-                    [ -f /jci/scripts/run-terminal.sh ] && sh /jci/scripts/run-terminal.sh
+                # v74: via the local trigger 127.0.0.1:9997 (inetd, see terminal/); MMUI ReadDTC 22 does not
+                # exist on v74. Falls back to run-terminal.sh / systemHooks.sh 22.
+                echo "Starting terminal..."
+                if netstat -ltn 2>/dev/null | grep -q "127.0.0.1:9997"; then
+                    nc 127.0.0.1 9997 </dev/null >/dev/null 2>&1
+                elif [ -f /jci/scripts/run-terminal.sh ]; then
+                    sh /jci/scripts/run-terminal.sh
                 else
-                    echo "  /tmp/dbus_service_socket missing - fallback run-terminal.sh:"
-                    [ -f /jci/scripts/run-terminal.sh ] && sh /jci/scripts/run-terminal.sh || echo "  run-terminal.sh not found"
+                    echo "  run-terminal.sh not found"
                 fi
                 # last-resort fallback (proven on hardware): systemHooks.sh event 22
                 if ! pidof terminal >/dev/null 2>&1 && [ -f /jci/scripts/systemHooks.sh ]; then
                     sh /jci/scripts/systemHooks.sh 22 2>/dev/null
                 fi
+                echo "  Close: type 'exit' in the terminal (or menu option 5)"
                 pause ;;
             5)
                 echo "Stopping terminal, back to UI..."
@@ -419,7 +419,8 @@ system_menu() {
                 pkill terminal 2>/dev/null
                 sleep 1
                 kill -9 $(pidof terminal 2>/dev/null) 2>/dev/null
-                ivi-shell -f "Main" >/dev/null 2>&1
+                # v74 has no surface "Main": bring the Opera GUI surface back to the front
+                (XDG_RUNTIME_DIR=/tmp ivi-shell -f JCI_OPERA_PRIMARY >/dev/null 2>&1 &); sleep 2; killall ivi-shell 2>/dev/null
                 echo "  Done"
                 pause ;;
             6)

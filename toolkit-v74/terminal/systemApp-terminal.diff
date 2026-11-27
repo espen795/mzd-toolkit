@@ -1,0 +1,55 @@
+--- systemApp.js.orig
++++ systemApp.js
+@@ -626,7 +626,7 @@
+     
+     // Array containing the appName of the list which supports Speed Restriction. 
+     //@appName = appName of the item , @status = default value of disabled property for particular appName
+-    this._SpeedRestrictedApps = [ {appName : "vdt_settings",status : true}];    
++    this._SpeedRestrictedApps = [ {appName : "vdt_settings",status : true}, {appName : "oemplusterminal",status : false}]; // OEMPLUS-TERMINAL: grijs tijdens rijden    
+ };
+ 
+ /**************************
+@@ -753,7 +753,9 @@
+         { appData : { appName : 'vdt_settings',   isVisible : false, audioSourceId : 'None',        mmuiEvent : 'SelectVehicleTelemetryTransfer'}, text1Id : 'VehicleTelemetryTransfer',    disabled : true,  itemStyle : 'style01', hasCaret : false },
+         { appData : { appName : 'vdt',            isVisible : false, audioSourceId : 'None',        mmuiEvent : 'SelectDriveRecord'             }, text1Id : 'DriveRecord',                 disabled : true,  itemStyle : 'style01', hasCaret : false },
+         { appData : { appName : 'carplay',        isVisible : false, audioSourceId : 'CarPlay',     mmuiEvent : 'SelectCarPlay'                 }, text1Id : 'CarPlay',                     disabled : true,  itemStyle : 'style01', hasCaret : false },
+-        { appData : { appName : 'androidauto',    isVisible : false, audioSourceId : 'AndroidAuto', mmuiEvent : 'SelectAndroidAuto'             }, text1Id : 'AndroidAuto',                 disabled : true,  itemStyle : 'style01', hasCaret : false }
++        { appData : { appName : 'androidauto',    isVisible : false, audioSourceId : 'AndroidAuto', mmuiEvent : 'SelectAndroidAuto'             }, text1Id : 'AndroidAuto',                 disabled : true,  itemStyle : 'style01', hasCaret : false },
++        // OEMPLUS-TERMINAL: eigen item, opent ws://127.0.0.1:9997 (inetd -> systemHooks.sh 22)
++        { appData : { appName : 'oemplusterminal', isVisible : true, audioSourceId : 'None',        mmuiEvent : 'OemplusTerminal'               }, text1 : 'Terminal',                      disabled : false, itemStyle : 'style01', hasCaret : false }
+     );
+ 
+     // All Application list items are kept in _masterApplicationDataList, including items that may or may not be present on a specific vehicle. 
+@@ -1941,6 +1943,14 @@
+  */
+ systemApp.prototype._menuItemSelectCallback = function(listCtrlObj, appData, params)
+ {
++    // OEMPLUS-TERMINAL: niet naar MMUI sturen (onbekend event), maar lokale trigger
++    if (appData && appData.appName === 'oemplusterminal')
++    {
++        if (framework.common.getAtSpeedValue()) { return; }
++        try { var oemplusWs = new WebSocket("ws://127.0.0.1:9997/"); setTimeout(function(){ try { oemplusWs.close(); } catch (e2) {} }, 3000); }
++        catch (e) { log.error("OEMPLUS-TERMINAL ws: " + e); }
++        return;
++    }
+     framework.sendEventToMmui(this.uiaId, appData.mmuiEvent, {}, params.fromVui);
+ };
+ 
+@@ -2827,7 +2837,7 @@
+         //We have two different context (Applications and VehicleStatusMonitor) for displaying Appication item(s),so context wise storing the array of appName(s) to be displayed on corresponding Context.
+         this._applicationsCtxtWiseAppNames = {
+           //Context Name :  // [appName,appName....]
+-          "Applications"            : ["xmdata","hdtrafficimage","idm","ecoenergy","driverid","warnguide","schedmaint","vehicleStatus","vdt_settings","vdt","carplay","androidauto"],
++          "Applications"            : ["xmdata","hdtrafficimage","idm","ecoenergy","driverid","warnguide","schedmaint","vehicleStatus","vdt_settings","vdt","carplay","androidauto","oemplusterminal"],
+           "VehicleStatusMonitor"    : ["vsm"]
+         };
+  
+@@ -2837,7 +2847,7 @@
+         //We have two different context (Applications and VehicleStatusMonitor) for displaying Appication item(s),so context wise storing the array of appName(s) to be displayed on corresponding Context.
+         this._applicationsCtxtWiseAppNames = {
+           //Context Name :  // [appName,appName....]
+-          "Applications"            : ["xmdata","hdtrafficimage","idm","ecoenergy","driverid","vehicleStatus","vdt_settings","vdt","carplay","androidauto"],
++          "Applications"            : ["xmdata","hdtrafficimage","idm","ecoenergy","driverid","vehicleStatus","vdt_settings","vdt","carplay","androidauto","oemplusterminal"],
+           "VehicleStatusMonitor"    : ["warnguide","vsm","schedmaint"]
+         }; 
+     }

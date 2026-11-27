@@ -203,6 +203,7 @@ Required state transitions for the ReadDTC route:
 
 | Route | Needs patch? | Notes |
 |---|---|---|
+| **GUI: *Applications -> Terminal*** (`toolkit-v74/terminal/`) | yes (RAM-only bind mount of `systemApp.js`) | **recommended**: own list item -> WebSocket `127.0.0.1:9997` -> inetd -> `systemHooks.sh 22`; permanent across reboots via the AA kit boot hook; greyed out while driving |
 | Serial `cmu` login (uid 0) -> `sh /jci/scripts/systemHooks.sh 22` | no | serial is a working root route on v74 |
 | Own sshd -> same command | no | stock sshd only accepts the Mazda key from read-only NOR |
 | GUI: patched `startSystemScripts.sh` + `SelectDiagnostics` -> `ActivateJCITest` -> `ReadDTC {payload:{testId:22}}` | yes (one line) | the v59 behavior, direct from GUI JS |
