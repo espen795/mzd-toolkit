@@ -14,7 +14,7 @@ Nothing is written if a check fails.
 import hashlib, os, shutil, subprocess, sys, tempfile
 
 STOCK_MD5 = "383d7e688256e09b825ced9e3eb69ee9"
-PATCHED_MD5 = "8e02903549579fbe98f195ce567c00ef"
+PATCHED_MD5 = "a9cdde3ecde4647183d1e4d6575978a7"
 HERE = os.path.dirname(os.path.abspath(__file__))
 DIFF = os.path.join(HERE, "systemApp-terminal.diff")
 

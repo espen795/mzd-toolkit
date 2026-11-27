@@ -1,5 +1,5 @@
 #!/bin/sh
-# gui-early.sh v1 (2026-11-27) — OEMPLUS Terminal-item in Applicaties, RAM-only.
+# gui-early.sh v2 (2026-11-27) — OEMPLUS Terminal-item in Applicaties, RAM-only.
 # Gestart op de achtergrond door aa-early.sh (boot-hook usb_drivers.sh, ~10 s), dus vóór Opera (~14 s).
 # Doet: md5-checks -> kopie naar /tmp -> bind-mount over systemApp.js -> inetd 127.0.0.1:9997.
 # Schrijft NOOIT naar de rootfs. Faalt altijd open (stock). Uitzetten: touch $G/DISABLE.
@@ -9,7 +9,7 @@ G=/data_persist/dev/gui
 T=/jci/gui/apps/system/js/systemApp.js
 TMPD=/tmp/gui-early
 STOCK=383d7e688256e09b825ced9e3eb69ee9     # systemApp.js MAZ_CMU-150_74.00.324
-PATCH=8e02903549579fbe98f195ce567c00ef     # + Terminal-item (grijs tijdens rijden)
+PATCH=a9cdde3ecde4647183d1e4d6575978a7     # + Terminal-item (grijs tijdens rijden) + disclaimer-timer 0/500 (v2)
 INETD_CONF=/data_persist/dev/bin/mzd-inetd.conf
 MAXFAIL=3; PROVEN_N=3; HEALTHY_AT=180; MAXUP=60
 LOG=$G/early.log
@@ -20,7 +20,7 @@ md5() { md5sum "$1" 2>/dev/null | cut -d' ' -f1; }
 
 [ -d $G ] || exit 0
 if [ -f $LOG ] && [ "$(wc -c < $LOG)" -gt 20000 ]; then tail -c 8000 $LOG > $LOG.tmp && mv $LOG.tmp $LOG; fi
-l "---- boot ---- gui-early v1"
+l "---- boot ---- gui-early v2"
 [ "$(up)" -le $MAXUP ] || [ "$1" = "--manual" ] || { l "uptime > ${MAXUP}s en niet --manual -> niets"; exit 0; }
 [ -f $G/DISABLE ] && { l "DISABLE aanwezig -> stock"; exit 0; }
 grep -q " $T " /proc/mounts && { l "al gemount -> niets"; exit 0; }

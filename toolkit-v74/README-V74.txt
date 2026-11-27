@@ -7,7 +7,8 @@ This folder is the v59 toolkit base PLUS the v74-specific pieces:
   - ssh/sshd_config_v74     your own sshd on port 2222 (stock 36000 = Mazda key only)
   - net/sshd-up-v74.sh      one-shot v74 bring-up: routing + firewall + sshd on 2222
   - aa/                     Android Auto on the original hub (no hub swap)
-  - terminal/               permanent "Terminal" item in Applications (RAM-only)
+  - terminal/               permanent "Terminal" item in Applications + shorter
+                            startup disclaimer (RAM-only)
 
 STATUS: the v59 scripts are hardware-tested on v59.00.502. This v74 variant is
 NOT fully tested on v74 hardware. Proven on v74.00.324A: the SSH bring-up

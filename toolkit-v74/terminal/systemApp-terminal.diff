@@ -35,6 +35,24 @@
      framework.sendEventToMmui(this.uiaId, appData.mmuiEvent, {}, params.fromVui);
  };
  
+@@ -2480,7 +2490,7 @@
+     if (this._disclaimerTime.reset)
+     {
+         this._disclaimerTime.reset = false;
+-        this._disclaimerTime.remaining = 3500;
++        this._disclaimerTime.remaining = 0;
+     }
+ 
+     if (this._disclaimerTime.remaining < 0)
+@@ -2522,7 +2532,7 @@
+     if (this._disclaimerTime.reset)
+     {
+         this._disclaimerTime.reset = false;
+-        this._disclaimerTime.remaining = 3500;
++        this._disclaimerTime.remaining = 500;
+     }
+ 
+     if (this._disclaimerTime.remaining < 0)
 @@ -2827,7 +2837,7 @@
          //We have two different context (Applications and VehicleStatusMonitor) for displaying Appication item(s),so context wise storing the array of appName(s) to be displayed on corresponding Context.
          this._applicationsCtxtWiseAppNames = {

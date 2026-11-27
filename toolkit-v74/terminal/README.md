@@ -1,4 +1,4 @@
-# Terminal in Applications (v74) - permanent, RAM-only
+# Terminal in Applications + shorter startup disclaimer (v74) - permanent, RAM-only
 
 Adds a **Terminal** item to *Applications* on firmware **v74.00.324**. Selecting it opens the
 on-screen terminal. Verified on real hardware (item present after a real reboot, opens the terminal,
@@ -17,6 +17,10 @@ on-screen terminal. Verified on real hardware (item present after a real reboot,
   the terminal (`systemHooks.sh 22`) or brings it to the front if it already runs.
 - The item is **greyed out while driving** (it is in the speed-restricted list, plus a speed check in
   the click handler). Driving behaviour is not tested yet.
+- The same patch also shortens the **startup disclaimer** (the warning screen after power-on): its
+  timer goes from 3500 ms to 0 (retry 3500 -> 500 ms; 0 there would busy-loop). Measured after a real
+  reboot: the disclaimer is on screen ~1 s instead of >= 3.5 s. It cannot be made fully invisible from
+  the GUI side, because the MMUI shows that screen itself.
 - Safety: md5 checks of the stock and patched file, a crash counter (3 failed boots -> `DISABLE`,
   i.e. stock), "proven" after 3 healthy boots. Always fails open (stock).
 

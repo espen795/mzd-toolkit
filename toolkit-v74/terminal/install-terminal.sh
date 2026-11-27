@@ -11,7 +11,7 @@
 # Takes effect after the next reboot. Undo: sh /data_persist/dev/gui/gui-status.sh disable
 SRC=${1:-$(cd "$(dirname "$0")" && pwd)}
 G=/data_persist/dev/gui; B=/data_persist/dev/bin
-PATCH=8e02903549579fbe98f195ce567c00ef
+PATCH=a9cdde3ecde4647183d1e4d6575978a7
 STOCK=383d7e688256e09b825ced9e3eb69ee9
 T=/jci/gui/apps/system/js/systemApp.js
 die() { echo "ERROR: $*" >&2; exit 1; }
