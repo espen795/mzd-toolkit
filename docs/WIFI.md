@@ -1,5 +1,10 @@
 # WiFi — TI WL1271 (wl12xx) deep dive
 
+> **Status: experimental - not reliable.** WiFi never stayed usable on the development unit, on v59,
+> on v74, and even on fully stock v74 software - a defective WiFi chip on that CMU is suspected (not
+> proven). The analysis and fixes below are kept for reference and for units whose WiFi does work on
+> stock firmware. For a dependable connection use the USB ethernet dongle or USB tethering.
+
 Root-cause analysis and fixes for the CMU's built-in WiFi. Everything below was
 proven against kernel logs from a live v59.00.502 unit.
 

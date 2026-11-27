@@ -1,6 +1,6 @@
 # Mazda MZD Toolkit
 
-A shell-script toolkit for the **Mazda Connect CMU** (the infotainment head unit) — WiFi connectivity, SSH access, USB tethering, wired LAN via USB dongle, vehicle data over D-Bus, full partition backups, and a GUI terminal shortcut. Runs entirely on the car, delivered on a FAT32 USB stick.
+A shell-script toolkit for the **Mazda Connect CMU** (the infotainment head unit) — SSH access, Android Auto over the original hub on v74, wired LAN via USB dongle, USB tethering, vehicle data over D-Bus with trip reports, a GUI terminal shortcut and full partition backups. (WiFi scripts exist but are experimental and unreliable - see the feature matrix.) Runs entirely on the car, delivered on a FAT32 USB stick.
 
 ## 🚗 NEW: Android Auto on v74 — with the ORIGINAL USB hub, no hardware swap
 
@@ -48,40 +48,40 @@ from **synthetic data** (no real GPS) — full PDF and generator in
 
 The CMU is a Linux box. Once you have root on it (via any known exploit — serial, ID7, or the autorun method), this toolkit gives you:
 
-- **WiFi** — connect to a hotspot through Mazda's own NMS D-Bus service (no second `wpa_supplicant`), plus power-save fixes for the flaky TI WL1271 chip
 - **SSH** — a working SSH daemon on port **36000**, user `cmu` (uid 0), RSA-2048 pubkey auth (password auth optional, see warnings)
 - **USB tethering** — internet on the CMU from an Android phone (`usb0`, CDC-ECM/NCM)
 - **Wired LAN** — USB ethernet dongle as `eth1` (ASIX AX88772 / Realtek RTL8152)
-- **Watchdog** — background WiFi recovery monitor
 - **Vehicle data** — CAN-bus / VIM signals via the JCI D-Bus service bus
 - **Backups** — full `dd` partition backups to USB
 - **Terminal menu** — patches the Settings GUI to add a Terminal entry
 - **Release builder** — `tools/build-release.sh` produces `tar.gz` + `zip` + `SHA256SUMS` with a built-in secrets scan
+- **WiFi (experimental, unreliable)** — connect scripts via Mazda's own NMS D-Bus service, a recovery watchdog and power-save fixes for the TI WL1271 chip. WiFi never became reliable on the development unit; for a dependable link use the USB ethernet dongle or USB tethering
 
 ## Feature matrix
 
 | Feature | Status | Notes |
 |---|---|---|
-| WiFi connect via NMS D-Bus (`wifi/connect-nms.sh`) | ✅ Tested on v59 hardware | Exit codes 0/4/5; power-save disabled to avoid wl12xx watchdog |
-| WiFi watchdog recovery (`tools/watchdog.sh`) | ✅ Tested | `once` / `bg` / `stop` / `status` |
-| WiFi power-save fix (`fix-powersave*.sh`) | ✅ Tested | `deauth reason=7` disappears when power save is off |
-| v74 firmware rollback (`wifi/rollback-firmware-v59.sh`) | ✅ Tested | v74 `sr.bin` (FRev .142) caused **more** watchdog crashes on this chip; rollback to v59 recommended |
+| **Android Auto on v74, original hub** (`toolkit-v74/aa/`) | ✅ Tested on v74 hardware | Two 1-byte patches bind-mounted at boot, stock rootfs untouched; crash counter + guard fall back to stock; no hub swap needed. See docs/ANDROID-AUTO-V74.md |
 | SSH daemon on port 36000 | ✅ Tested | OpenSSH 5.9p1 compat: RSA-2048 keys only, `ssh-rsa`/`ssh-dss` host keys, no `UsePAM`, no `-E` flag |
 | SSH pubkey auth | ✅ Tested | RSA-2048 via `authorized_keys` in `/data_persist/dev/bin` + `/tmp/mzd-sshd` |
 | SSH password auth | ⚠️ Works only if `/` is writable | v59 libcrypt accepts **DES hashes only** (13 chars, no `$` prefix); brute-forceable over WiFi — prefer pubkey |
+| USB ethernet dongle `eth1` | ✅ Tested (ASIX on v59 + v74) | The dependable way to reach the CMU (point-to-point cable). ASIX AX88772 (`0b95:772a`) via built-in `asix`; RTL8152 (`0bda:8152`) via `cdc_ether` + `new_id` bind (no `r8152` module needed); registration can take up to ~60 s after boot |
 | USB tethering (Android, CDC) | ✅ Tested | Samsung RNDIS PID `04e8:6863` works with `rndis_host` v3; AOA/MTP PID `04e8:6860` does **not** give `usb0`; iOS tethering **not supported** (no `iph_eth` in kernel) |
-| USB ethernet dongle `eth1` | ⚠️ Experimental | ASIX AX88772 (`0b95:772a`) via built-in `asix`; RTL8152 (`0bda:8152`) via `cdc_ether` + `new_id` bind (no `r8152` module needed); registration can take up to ~60 s after boot |
 | Terminal item in Applications + shorter startup disclaimer, v74 (`toolkit-v74/terminal/`) | ✅ Tested on v74 hardware | Bind-mounted `systemApp.js` patch built from your own stock file; opens the terminal via a local inetd trigger, greyed out while driving (driving itself not tested yet); startup disclaimer ~1 s instead of 3.5 s |
 | Terminal menu patch (`tools/add-terminal-menu.sh`) | ✅ Tested | Patches `syssettingsApp.js` `_SystemTabHelperArray` with `uiaId="diag"`; reboot required |
-| Full partition backup (`tools/backup.sh`, dd) | ✅ Tested | Long-running; disable the hardware watchdog first; verify sizes after |
-| CAN/VIM vehicle data (`tools/can-monitor.sh`, `tools/vehicle-data.sh`) | ✅ Tested | Passive D-Bus monitor; meaningful data needs ignition on |
-| Release builder (`tools/build-release.sh`) | ✅ Tested | tar.gz primary (CMU has no `unzip`), zip for PC, SHA256SUMS, post-build secrets scan that fails the build |
-| **Android Auto on v74, original hub** (`toolkit-v74/aa/`) | ✅ Tested on v74 hardware | Two 1-byte patches bind-mounted at boot, stock rootfs untouched; crash counter + guard fall back to stock; no hub swap needed. See docs/ANDROID-AUTO-V74.md |
 | D-Bus trip report (`tools/trip-analysis/`) | ✅ Tested (v59 + v74) | 14-page PDF: speed/rpm/gears, driving-style score + shift quality, g-forces, wheel speeds, i-Stop/brakes, OSM route map |
-| WiFi (TI WL1271) on this unit | ❌ Not working | Firmware watchdog resets + TX-flush loops on v59, on v74, and with the v74 chip firmware on v59. It also fails on fully stock v74 software, so a **defective WiFi chip on this particular CMU is suspected** - not proven. Unknown whether other units are affected. Use USB ethernet or USB tethering instead |
-| v74 in daily use | ✅ Works (except WiFi) | Driven daily on v74 with Android Auto, SSH and D-Bus logging. **WiFi does not work** on this unit - see the row below. **v74 also resets your access on every update** (see docs/V74.md): own sshd needed (`/config-mfg/authorized_keys` = Mazda key only), `neutralizeid7` wipes the autorun hook, USB autorun is compiled out, ICMP is firewalled |
+| CAN/VIM vehicle data (`tools/can-monitor.sh`, `tools/vehicle-data.sh`) | ✅ Tested | Passive D-Bus monitor; meaningful data needs ignition on |
+| Full partition backup (`tools/backup.sh`, dd) | ✅ Tested | Long-running; disable the hardware watchdog first; verify sizes after |
+| Release builder (`tools/build-release.sh`) | ✅ Tested | tar.gz primary (CMU has no `unzip`), zip for PC, SHA256SUMS, post-build secrets scan that fails the build |
+| v74 in daily use | ✅ Works (except WiFi) | Driven daily on v74 with Android Auto, SSH and D-Bus logging. **WiFi does not work** on this unit - see the WiFi rows at the end. **v74 also resets your access on every update** (see docs/V74.md): own sshd needed (`/config-mfg/authorized_keys` = Mazda key only), `neutralizeid7` wipes the autorun hook, USB autorun is compiled out, ICMP is firewalled |
 | Other USB dongles (non-ASIX/RTL8152) | ❓ Untested | |
 | iOS USB tethering | ❌ Not working | kernel lacks `iph_eth` |
+| **WiFi - experimental, not reliable** | | Scripts below exist and behave as described in isolated tests, but WiFi never stayed usable on the development unit |
+| WiFi (TI WL1271) on this unit | ❌ Not working | Firmware watchdog resets + TX-flush loops on v59, on v74, and with the v74 chip firmware on v59. It also fails on fully stock v74 software, so a **defective WiFi chip on this particular CMU is suspected** - not proven. Unknown whether other units are affected. Use USB ethernet or USB tethering instead |
+| WiFi connect via NMS D-Bus (`wifi/connect-nms.sh`) | ⚠️ Experimental | Got an IP in tests, but the link drops (firmware watchdog resets). Exit codes 0/4/5; power-save disabled to avoid wl12xx watchdog |
+| WiFi watchdog recovery (`tools/watchdog.sh`) | ⚠️ Experimental | `once` / `bg` / `stop` / `status` |
+| WiFi power-save fix (`fix-powersave*.sh`) | ⚠️ Experimental | `deauth reason=7` disappears when power save is off, but that alone does not make WiFi stable |
+| v74 firmware rollback (`wifi/rollback-firmware-v59.sh`) | ⚠️ Experimental | v74 `sr.bin` (FRev .142) caused **more** watchdog crashes on this chip; rollback to v59 recommended |
 
 ## Requirements
 
@@ -107,8 +107,8 @@ The CMU is a Linux box. Once you have root on it (via any known exploit — seri
    sh /data_persist/mzd-toolkit/menu.sh     # after persist-install (no stick needed)
    sh /tmp/mnt/sd*/mzd-toolkit/menu.sh      # from USB — glob, the CMU terminal has no Shift key
    ```
-   What *does* autostart on every boot: WiFi connect, SSH on 36000, eth1 dongle.
-5. In the menu choose **3. All-in-one: WiFi + SSH + watchdog** — or drive the pieces individually.
+   What *does* autostart on every boot: SSH on 36000, the eth1 dongle, and a WiFi connect attempt (experimental).
+5. In the menu use the **SSH** and **Network (USB-Ethernet)** options. (Option 3 *All-in-one* also tries WiFi, which is experimental.)
    The menu is **numeric-only** (type a number — the CMU terminal has no Shift key).
    **Menu ↔ UI switching:** System & security → **4** starts the on-screen terminal
    (diag code 22 via MMUI, no patch/reboot needed), **5** closes it back to the
@@ -178,9 +178,9 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 
 ## What works / what doesn't
 
-**Works (verified on v59.00.502 hardware):** WiFi via NMS, watchdog recovery, SSH pubkey (RSA-2048) and password (DES hash) on port 36000, Android USB tethering (CDC and Samsung RNDIS with rndis_host v3), ASIX AX88772 + RTL8152 on `eth1`, terminal menu injection, dd backups, release build + sha256.
+**Works (verified on v59.00.502 hardware):** SSH pubkey (RSA-2048) and password (DES hash) on port 36000, Android USB tethering (CDC and Samsung RNDIS with rndis_host v3), ASIX AX88772 + RTL8152 on `eth1`, terminal menu injection, dd backups, release build + sha256.
 
-**Doesn't / not tested:** WiFi on this unit (watchdog loops on every firmware tried, incl. stock v74 - suspected chip defect), iOS tethering, USB WiFi dongles other than rt2800 (experimental `wlan1` path), dongles other than ASIX/RTL8152, long-running backups under load without the watchdog disabled.
+**Doesn't / not tested:** WiFi (experimental: watchdog loops on every firmware tried, incl. stock v74 - suspected chip defect on the development unit), iOS tethering, USB WiFi dongles other than rt2800 (experimental `wlan1` path), dongles other than ASIX/RTL8152, long-running backups under load without the watchdog disabled.
 
 ## Documentation
 
@@ -205,6 +205,8 @@ This toolkit was developed **with AI assistance** (Mistral Large 4 agents) itera
 - [CHANGELOG.md](CHANGELOG.md) — version history
 - [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
 - [LICENSE](LICENSE) — MIT
+- [docs/WIFI.md](docs/WIFI.md) — WiFi (experimental, not reliable): TI WL1271 root-cause analysis, NMS connect, watchdog; why it failed on the development unit
+
 
 ## Related projects
 

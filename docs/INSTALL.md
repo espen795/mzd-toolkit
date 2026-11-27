@@ -54,7 +54,7 @@ Stick layout after extraction:
    sh /tmp/mnt/sd*/mzd-toolkit/menu.sh         # glob: no Shift key on the CMU terminal, so `sd*` not `sdb1`
    ```
    What DOES autostart on every boot (via the autorun hook, no menu needed):
-   WiFi connect, SSH on port 36000, and the eth1 dongle — see `net/autostart-eth1-ssh.sh`.
+   SSH on port 36000, the eth1 dongle, and a WiFi connect attempt (WiFi is experimental and unreliable) — see `net/autostart-eth1-ssh.sh`.
    To make the menu itself launch at boot, add one line to `/data_persist/dev/bin/autorun`:
    ```sh
    sh /data_persist/mzd-toolkit/menu.sh >> /tmp/mzd-menu.log 2>&1 &
@@ -65,7 +65,7 @@ Stick layout after extraction:
    - creates `mzd-data/{config,state,logs,backups,runs}` on both the stick and `/data_persist`,
    - patches `stage_wifi.sh` **and** `stage_1.sh` hooks (idempotent, `.org` backups),
    - runs a USB health pre-flight (rw-check + `LOST.DIR` detection — reformat the stick if it warns).
-4. Reboot the car. After reboot, WiFi + SSH autostart via `autorun` (the menu does not — start it manually as above, or add the autostart line).
+4. Reboot the car. After reboot, SSH (and an experimental WiFi attempt) autostart via `autorun` (the menu does not — start it manually as above, or add the autostart line).
 
 ### Switching between the terminal menu and the normal UI
 
